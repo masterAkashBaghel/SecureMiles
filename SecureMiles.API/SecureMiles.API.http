@@ -1,0 +1,6 @@
+@SecureMiles.API_HostAddress = http://localhost:5294
+
+GET {{SecureMiles.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

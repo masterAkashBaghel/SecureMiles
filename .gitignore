@@ -1,0 +1,57 @@
+
+
+# Ignore Visual Studio temporary files, build results, and
+# build logs.
+bin/
+obj/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# VS Code specific files
+.vscode/
+
+# Rider specific files
+.idea/
+
+# Logs
+*.log
+
+# Database files
+*.mdf
+*.ldf
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Package directories
+*.nuget/
+node_modules/
+
+# Environment variables
+.env
+.env.local
+
+# Publish output
+publish/
+wwwroot/
+
+# Certificates
+*.pfx
+*.p12
+
+# Dependency cache
+*.deps.json
+
+# Lock files
+project.lock.json
+project.fragment.lock.json
+
+# Azure and hosting artifacts
+.localhistory/
+*.publishsettings

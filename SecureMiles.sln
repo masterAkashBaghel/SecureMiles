@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecureMiles.API", "SecureMiles.API\SecureMiles.API.csproj", "{2409D7D8-1DA6-4A5C-916E-C7EADAB16E10}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecureMiles.Models", "SecureMiles.Models\SecureMiles.Models.csproj", "{00F7E7BC-71B7-4D87-BCD5-6975F97534AC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecureMiles.Repositories", "SecureMiles.Repositories\SecureMiles.Repositories.csproj", "{93663FF0-2BA3-4CF1-B053-B6E46F48781E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecureMiles.Services", "SecureMiles.Services\SecureMiles.Services.csproj", "{487EDC8D-F122-445A-A899-21573F282072}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecureMiles.Utilities", "SecureMiles.Utilities\SecureMiles.Utilities.csproj", "{6A07C247-AF83-460F-BB5F-AF8E3D3AA637}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecureMiles.Common", "SecureMiles.Common\SecureMiles.Common.csproj", "{AA14A424-B243-4D98-B420-F16F586429C6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2409D7D8-1DA6-4A5C-916E-C7EADAB16E10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2409D7D8-1DA6-4A5C-916E-C7EADAB16E10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2409D7D8-1DA6-4A5C-916E-C7EADAB16E10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2409D7D8-1DA6-4A5C-916E-C7EADAB16E10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00F7E7BC-71B7-4D87-BCD5-6975F97534AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00F7E7BC-71B7-4D87-BCD5-6975F97534AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00F7E7BC-71B7-4D87-BCD5-6975F97534AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00F7E7BC-71B7-4D87-BCD5-6975F97534AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93663FF0-2BA3-4CF1-B053-B6E46F48781E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93663FF0-2BA3-4CF1-B053-B6E46F48781E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93663FF0-2BA3-4CF1-B053-B6E46F48781E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93663FF0-2BA3-4CF1-B053-B6E46F48781E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{487EDC8D-F122-445A-A899-21573F282072}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{487EDC8D-F122-445A-A899-21573F282072}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{487EDC8D-F122-445A-A899-21573F282072}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{487EDC8D-F122-445A-A899-21573F282072}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A07C247-AF83-460F-BB5F-AF8E3D3AA637}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A07C247-AF83-460F-BB5F-AF8E3D3AA637}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A07C247-AF83-460F-BB5F-AF8E3D3AA637}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A07C247-AF83-460F-BB5F-AF8E3D3AA637}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA14A424-B243-4D98-B420-F16F586429C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA14A424-B243-4D98-B420-F16F586429C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA14A424-B243-4D98-B420-F16F586429C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA14A424-B243-4D98-B420-F16F586429C6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

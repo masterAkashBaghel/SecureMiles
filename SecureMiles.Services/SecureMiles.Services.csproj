@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SecureMiles.Common\SecureMiles.Common.csproj" />
+    <ProjectReference Include="..\SecureMiles.Models\SecureMiles.Models.csproj" />
+    <ProjectReference Include="..\SecureMiles.Repositories\SecureMiles.Repositories.csproj" />
+  </ItemGroup>
+</Project>
