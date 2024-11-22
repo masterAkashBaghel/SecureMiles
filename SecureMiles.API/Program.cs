@@ -6,6 +6,7 @@ using SecureMiles.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +43,20 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// logger configuration
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration) // Read from appsettings.json
+    .CreateLogger();
+
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug() // Set the minimum log level (e.g., Debug, Information, Warning)
+    .WriteTo.Console()    // Write logs to the console
+    .WriteTo.File("Logs/SecureMiles.log", rollingInterval: RollingInterval.Day) // Write logs to a file
+    .CreateLogger();
+
+// Replace the default logging with Serilog
+builder.Host.UseSerilog();
 
 
 // JWT Configuration
