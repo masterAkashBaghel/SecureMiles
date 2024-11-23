@@ -3,6 +3,8 @@ using SecureMiles.Services;
 using SecureMiles.Common.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;
+using System.Security.Claims;
+using SecureMiles.Common.DTOs.User;
 
 
 namespace SecureMiles.API.Controllers
@@ -19,10 +21,6 @@ namespace SecureMiles.API.Controllers
             _userService = userService;
             _logger = logger;
         }
-
-
-
-
 
         [HttpPost("signin")]
         public async Task<IActionResult> SignIn([FromBody] SignInRequestDto signInRequest)
@@ -51,6 +49,9 @@ namespace SecureMiles.API.Controllers
                 return StatusCode(500, new { Error = "An unexpected error occurred.", Details = ex.Message }); // 500 Internal Server Error
             }
         }
+
+
+
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerRequest)
         {
@@ -74,10 +75,113 @@ namespace SecureMiles.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected error occurred while registering: {Email}", registerRequest.Email);
+                _logger.LogError(ex, "An unexpected error occurred while reg--->: {Email}", registerRequest.Email);
                 return StatusCode(500, new { Error = "An unexpected error occurred.", Details = ex.Message }); // 500 Internal Server Error
             }
         }
+
+
+
+
+
+        [HttpPut("profile")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserProfileRequestDto request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState); // Validation error
+            }
+
+            try
+            {
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value); // Extract UserID from JWT
+                var result = await _userService.UpdateUserProfileAsync(userId, request);
+
+                _logger.LogInformation("User {UserId} updated their profile successfully.", userId);
+
+                return Ok(result);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "User not found for profile update.");
+                return NotFound(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while updating profile.");
+                return StatusCode(500, new { Message = "An unexpected error occurred." });
+            }
+        }
+
+        [HttpGet("profile")]
+        [Authorize] // Ensures only authenticated users can access this
+        public async Task<IActionResult> GetProfile()
+        {
+            try
+            {
+                // Extract UserID from JWT claims
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+                // Fetch the user's profile
+                var userProfile = await _userService.GetUserProfileAsync(userId);
+
+                return Ok(userProfile);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "Profile retrieval failed for user ID {UserId}.", User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                return NotFound(new { Error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while retrieving the profile for user ID {UserId}.", User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                return StatusCode(500, new { Error = "An unexpected error occurred." });
+            }
+        }
+        [HttpDelete("{userId}")]
+        [Authorize(Roles = "Admin")] // Restrict to admins
+        public async Task<IActionResult> DeleteUser(int userId)
+        {
+            try
+            {
+                await _userService.DeleteUserAsync(userId);
+                _logger.LogInformation("User {UserId} deleted successfully by Admin.", userId);
+                return NoContent(); // 204 No Content
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "Failed to delete user. User {UserId} not found.", userId);
+                return NotFound(new { Error = ex.Message }); // 404 Not Found
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while deleting user {UserId}.", userId);
+                return StatusCode(500, new { Error = "An unexpected error occurred." }); // 500 Internal Server Error
+            }
+        }
+        [HttpDelete("profile")]
+        [Authorize] // Ensure the user is logged in
+        public async Task<IActionResult> DeleteOwnProfile()
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value); // Extract UserID from JWT
+                await _userService.DeleteUserAsync(userId);
+
+                _logger.LogInformation("User {UserId} deleted their own profile.", userId);
+
+                // return message
+                return Ok(new { Message = "User profile deleted successfully." });
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while deleting profile for user {UserId}.", User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                return StatusCode(500, new { Error = "An unexpected error occurred." }); // 500 Internal Server Error
+            }
+        }
+
 
     }
 }

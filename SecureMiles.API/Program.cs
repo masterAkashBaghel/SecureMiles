@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using SecureMiles.Repositories.Vehicle;
+using SecureMiles.Services.Vehicle;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -96,9 +98,12 @@ builder.Services.AddDbContext<InsuranceContext>(options =>
 
 // Register repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
 
 // Register services
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IVehicleService, VehicleService>();
+
 
 var app = builder.Build();
 
