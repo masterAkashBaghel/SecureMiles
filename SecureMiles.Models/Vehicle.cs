@@ -55,6 +55,9 @@ namespace SecureMiles.Models
         public required ICollection<Policy> Policies { get; set; }
 
         public required ICollection<Proposal> Proposals { get; set; }
+
+        public bool IsActive { get; set; } = true; // Default value for active users
+
     }
 
     public enum VehicleType

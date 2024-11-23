@@ -1,6 +1,6 @@
 
-using System.Threading.Tasks;
 using SecureMiles.Common.DTOs;
+using SecureMiles.Common.DTOs.User;
 
 namespace SecureMiles.Services
 {
@@ -8,5 +8,11 @@ namespace SecureMiles.Services
     {
         Task<RegisterResponseDto> RegisterUserAsync(RegisterRequestDto registerRequest);
         Task<SignInResponseDto> SignInAsync(SignInRequestDto signInRequest);
+
+        Task<UpdateUserProfileResponseDto> UpdateUserProfileAsync(int userId, UpdateUserProfileRequestDto request);
+
+        Task<UserProfileResponseDto> GetUserProfileAsync(int userId);
+
+        Task DeleteUserAsync(int userId);
     }
 }

@@ -56,6 +56,9 @@ public class User
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 
+    public bool IsActive { get; set; } = true; // Default value for active users
+
+
     // One-to-many relationships
 
     public required ICollection<Vehicle> Vehicles { get; set; } // User owns multiple vehicles

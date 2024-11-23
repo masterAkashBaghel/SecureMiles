@@ -9,6 +9,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using SecureMiles.Common.DTOs.User;
 
 
 namespace SecureMiles.Services
@@ -17,11 +19,14 @@ namespace SecureMiles.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<UserService> _logger;
 
-        public UserService(IUserRepository userRepository, IConfiguration configuration)
+        public UserService(IUserRepository userRepository, IConfiguration configuration, ILogger<UserService> logger)
         {
             _userRepository = userRepository;
             _configuration = configuration;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
         }
 
 
@@ -31,19 +36,29 @@ namespace SecureMiles.Services
             var user = await _userRepository.GetUserByEmailAsync(signInRequest.Email);
             if (user == null)
             {
+                _logger.LogWarning("User with email {Email} not found.", signInRequest.Email);
                 throw new UnauthorizedAccessException("Invalid email or password.");
             }
 
             // Validate the password
             if (!VerifyPassword(signInRequest.Password, user.PasswordHash))
             {
+                _logger.LogWarning("Invalid password for user with email {Email}.", signInRequest.Email);
                 throw new UnauthorizedAccessException("Invalid email or password.");
+            }
+
+            // Check if the user is active
+            if (!user.IsActive)
+            {
+                _logger.LogWarning("User with email {Email} is not active.", signInRequest.Email);
+                throw new UnauthorizedAccessException("User is not active.");
             }
 
             // Generate a token  
             var token = GenerateJwtToken(user);
 
             // Return the token and success message
+            _logger.LogInformation("User with email {Email} signed in successfully.", signInRequest.Email);
             return new SignInResponseDto
             {
                 Token = token,
@@ -52,7 +67,7 @@ namespace SecureMiles.Services
             };
         }
 
-        private bool VerifyPassword(string password, string storedHash)
+        public virtual bool VerifyPassword(string password, string storedHash)
         {
             using var sha256 = SHA256.Create();
             var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
@@ -99,6 +114,7 @@ namespace SecureMiles.Services
                 throw new InvalidOperationException("A user with this email already exists.");
             }
 
+
             // Hash the password
             var hashedPassword = HashPassword(registerRequest.Password);
 
@@ -118,16 +134,17 @@ namespace SecureMiles.Services
                 ZipCode = "",
                 AadhaarNumber = "",
                 PAN = "",
-                Vehicles = new List<Vehicle>(),
-                Policies = new List<Policy>(),
-                Proposals = new List<Proposal>(),
-                Notifications = new List<Notification>(),
+                Vehicles = [],
+                Policies = [],
+                Proposals = [],
+                Notifications = [],
             };
 
             // Add the user to the database
             await _userRepository.AddUserAsync(newUser);
 
             // Return success message
+            _logger.LogInformation("User with email {Email} registered successfully.", registerRequest.Email);
             return new RegisterResponseDto
             {
                 Success = true,
@@ -143,6 +160,92 @@ namespace SecureMiles.Services
             return Convert.ToBase64String(hashedBytes);
         }
 
+        public async Task<UpdateUserProfileResponseDto> UpdateUserProfileAsync(int userId, UpdateUserProfileRequestDto request)
+        {
+            // Fetch the existing user
+            var existingUser = await _userRepository.GetUserByIdAsync(userId);
+            if (existingUser == null)
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+
+
+
+            // Update allowed fields only
+            existingUser.Name = request.Name;
+            existingUser.Address = request.Address;
+            existingUser.City = request.City;
+            existingUser.State = request.State;
+            existingUser.ZipCode = request.ZipCode;
+            existingUser.Phone = request.Phone;
+            existingUser.DOB = request.DOB;
+            existingUser.AadhaarNumber = request.AadhaarNumber;
+            existingUser.PAN = request.PAN;
+
+            // Update user in the database
+            var updatedUser = await _userRepository.UpdateUserProfileAsync(userId, existingUser);
+
+            // Return response DTO
+            return new UpdateUserProfileResponseDto
+            {
+                UserId = updatedUser.UserID,
+                Name = updatedUser.Name,
+                Address = updatedUser.Address,
+                City = updatedUser.City,
+                State = updatedUser.State,
+                ZipCode = updatedUser.ZipCode,
+                Phone = updatedUser.Phone,
+                DOB = updatedUser.DOB,
+                AadhaarNumber = updatedUser.AadhaarNumber,
+                PAN = updatedUser.PAN,
+                UpdatedAt = updatedUser.UpdatedAt ?? DateTime.MinValue
+            };
+        }
+
+        public async Task<UserProfileResponseDto> GetUserProfileAsync(int userId)
+        {
+            // Fetch the user from the repository
+            var user = await _userRepository.GetUserByIdAsync(userId);
+
+            if (user == null)
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+
+            // Map the user entity to a response DTO
+            return new UserProfileResponseDto
+            {
+                UserId = user.UserID,
+                Name = user.Name,
+                Email = user.Email,
+                Phone = user.Phone,
+                Address = user.Address,
+                City = user.City,
+                State = user.State,
+                ZipCode = user.ZipCode,
+                AadhaarNumber = user.AadhaarNumber,
+                PAN = user.PAN,
+                CreatedAt = user.CreatedAt,
+                UpdatedAt = user.UpdatedAt
+            };
+        }
+
+        public async Task DeleteUserAsync(int userId)
+        {
+            // Fetch the user
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+
+            // Soft delete by marking the user as inactive
+            user.IsActive = false;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            // Update the user in the database
+            await _userRepository.UpdateUserAsync(user);
+        }
 
     }
 }
