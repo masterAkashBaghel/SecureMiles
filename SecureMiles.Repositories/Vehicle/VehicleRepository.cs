@@ -167,6 +167,19 @@ namespace SecureMiles.Repositories.Vehicle
 
             return true; // Successfully deleted
         }
+        public async Task<Models.Vehicle?> GetVehicleEntityAsync(int vehicleId, int userId)
+        {
+            var vehicle = await _context.Vehicles
+                .Include(v => v.User) // Include User relationship
+                .FirstOrDefaultAsync(v => v.VehicleID == vehicleId && v.UserID == userId && v.IsActive);
+
+            if (vehicle == null)
+            {
+                return null;
+            }
+
+            return vehicle;
+        }
 
     }
 }

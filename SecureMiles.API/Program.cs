@@ -9,6 +9,8 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using SecureMiles.Repositories.Vehicle;
 using SecureMiles.Services.Vehicle;
+using SecureMiles.Repositories.Policy;
+using SecureMiles.Services.Policy;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -99,10 +101,12 @@ builder.Services.AddDbContext<InsuranceContext>(options =>
 // Register repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
+builder.Services.AddScoped<IPolicyRepository, PolicyRepository>();
 
 // Register services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
+builder.Services.AddScoped<IPolicyServices, PolicyService>();
 
 
 var app = builder.Build();

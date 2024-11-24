@@ -95,7 +95,13 @@ namespace SecureMiles.API.Controllers
 
             try
             {
-                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value); // Extract UserID from JWT
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim == null)
+                {
+                    _logger.LogWarning("User ID claim not found.");
+                    return Unauthorized(new { Error = "User ID claim not found." });
+                }
+                var userId = int.Parse(userIdClaim); // Extract UserID from JWT
                 var result = await _userService.UpdateUserProfileAsync(userId, request);
 
                 _logger.LogInformation("User {UserId} updated their profile successfully.", userId);
@@ -121,7 +127,13 @@ namespace SecureMiles.API.Controllers
             try
             {
                 // Extract UserID from JWT claims
-                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim == null)
+                {
+                    _logger.LogWarning("User ID claim not found.");
+                    return Unauthorized(new { Error = "User ID claim not found." });
+                }
+                var userId = int.Parse(userIdClaim);
 
                 // Fetch the user's profile
                 var userProfile = await _userService.GetUserProfileAsync(userId);
@@ -166,7 +178,13 @@ namespace SecureMiles.API.Controllers
         {
             try
             {
-                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value); // Extract UserID from JWT
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim == null)
+                {
+                    _logger.LogWarning("User ID claim not found.");
+                    return Unauthorized(new { Error = "User ID claim not found." });
+                }
+                var userId = int.Parse(userIdClaim); // Extract UserID from JWT
                 await _userService.DeleteUserAsync(userId);
 
                 _logger.LogInformation("User {UserId} deleted their own profile.", userId);

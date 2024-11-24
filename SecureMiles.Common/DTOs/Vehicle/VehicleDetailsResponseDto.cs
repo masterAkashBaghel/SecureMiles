@@ -23,6 +23,8 @@ namespace SecureMiles.Common.DTOs.Vehicle
 
         public List<ProposalResponseDto>? Proposals { get; set; }
         public List<PolicyResponseDto>? Policies { get; set; }
+
+
     }
 
 }
