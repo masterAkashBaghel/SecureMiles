@@ -16,6 +16,9 @@ namespace SecureMiles.Common.Data
         public required DbSet<Document> Documents { get; set; }
         public required DbSet<Notification> Notifications { get; set; }
 
+        public required DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Decimal Precision

@@ -4,13 +4,12 @@ using System.Security.Cryptography;
 using System.Text;
 using SecureMiles.Common.DTOs;
 using Microsoft.IdentityModel.Tokens;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SecureMiles.Common.DTOs.User;
+using SecureMiles.Services.Mail;
 
 
 namespace SecureMiles.Services
@@ -21,11 +20,16 @@ namespace SecureMiles.Services
         private readonly IConfiguration _configuration;
         private readonly ILogger<UserService> _logger;
 
-        public UserService(IUserRepository userRepository, IConfiguration configuration, ILogger<UserService> logger)
+        private readonly EmailService _emailService;
+
+
+
+        public UserService(IUserRepository userRepository, IConfiguration configuration, ILogger<UserService> logger, EmailService emailService)
         {
             _userRepository = userRepository;
             _configuration = configuration;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _emailService = emailService;
 
         }
 
@@ -246,6 +250,86 @@ namespace SecureMiles.Services
             // Update the user in the database
             await _userRepository.UpdateUserAsync(user);
         }
+        public async Task<ForgotPasswordResponseDto> InitiatePasswordResetAsync(ForgotPasswordRequestDto request)
+        {
+            // Validate email
+            if (string.IsNullOrEmpty(request.Email))
+            {
+                throw new ArgumentException("Email cannot be null or empty.", nameof(request.Email));
+            }
+
+            var user = await _userRepository.GetUserByEmailAsync(request.Email);
+            if (user == null)
+            {
+                throw new KeyNotFoundException("User with this email does not exist.");
+            }
+
+            // Generate token
+            var token = GenerateOtp();
+            var expiryTime = DateTime.UtcNow.AddMinutes(15); // Token valid for 15 minutes
+
+            // Save token to database
+            var resetToken = new PasswordResetToken
+            {
+                UserId = user.UserID,
+                Token = token,
+                ExpiryTime = expiryTime
+            };
+            await _userRepository.AddResetTokenAsync(resetToken);
+
+            // Send email
+            var subject = "Password Reset Request";
+            var body = $"Your password reset token is: {token}\nThis token will expire at {expiryTime}.";
+            await _emailService.SendEmailAsync(user.Email, subject, body);
+
+            return new ForgotPasswordResponseDto
+            {
+                Message = "Password reset email sent successfully, please check your inbox.",
+            };
+        }
+        public string GenerateOtp(int length = 6)
+        {
+            var random = new Random();
+            var otp = new char[length];
+            for (int i = 0; i < length; i++)
+            {
+                otp[i] = (char)('0' + random.Next(0, 10));
+            }
+            return new string(otp);
+        }
+        public async Task<ResetPasswordResponseDto> ResetPasswordAsync(ResetPasswordRequestDto request)
+        {
+            // Validate token
+            if (string.IsNullOrEmpty(request.Token))
+            {
+                throw new ArgumentException("Token cannot be null or empty.", nameof(request.Token));
+            }
+            var tokenEntity = await _userRepository.GetValidTokenAsync(request.Token);
+            if (tokenEntity == null)
+            {
+                throw new InvalidOperationException("Invalid or expired token.");
+            }
+
+            // Hash the new password
+            if (string.IsNullOrEmpty(request.NewPassword))
+            {
+                throw new ArgumentException("New password cannot be null or empty.", nameof(request.NewPassword));
+            }
+            var hashedPassword = HashPassword(request.NewPassword);
+
+            // Update user's password
+            await _userRepository.UpdateUserPasswordAsync(tokenEntity.UserId, hashedPassword);
+
+            // Mark token as used
+            await _userRepository.MarkTokenAsUsedAsync(tokenEntity);
+
+            return new ResetPasswordResponseDto
+            {
+                Message = "Password has been reset successfully."
+            };
+        }
+
+
 
     }
 }

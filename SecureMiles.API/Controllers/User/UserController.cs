@@ -199,7 +199,55 @@ namespace SecureMiles.API.Controllers
                 return StatusCode(500, new { Error = "An unexpected error occurred." }); // 500 Internal Server Error
             }
         }
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
+            try
+            {
+                var response = await _userService.InitiatePasswordResetAsync(request);
+                return Ok(response);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "Password reset failed for email: {Email}.", request.Email);
+                return NotFound(new { Error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred during password reset.");
+                return StatusCode(500, new { Error = "An unexpected error occurred." });
+            }
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var response = await _userService.ResetPasswordAsync(request);
+                return Ok(response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Password reset failed for token: {Token}", request.Token);
+                return BadRequest(new { Error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred during password reset.");
+                return StatusCode(500, new { Error = "An unexpected error occurred." });
+            }
+        }
 
     }
 }

@@ -73,6 +73,39 @@ namespace SecureMiles.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task AddResetTokenAsync(PasswordResetToken token)
+        {
+            await _context.PasswordResetTokens.AddAsync(token);
+            await _context.SaveChangesAsync();
+        }
+        public async Task<PasswordResetToken?> GetValidTokenAsync(string token)
+        {
+            return await _context.PasswordResetTokens
+                .FirstOrDefaultAsync(t => t.Token == token && !t.IsUsed && t.ExpiryTime > DateTime.UtcNow);
+        }
+
+        public async Task MarkTokenAsUsedAsync(PasswordResetToken token)
+        {
+            token.IsUsed = true;
+            _context.PasswordResetTokens.Update(token);
+            await _context.SaveChangesAsync();
+        }
+
+
+        public async Task UpdateUserPasswordAsync(int userId, string hashedPassword)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserID == userId);
+            if (user == null)
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+
+            user.PasswordHash = hashedPassword;
+            user.UpdatedAt = DateTime.UtcNow;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+        }
+
 
     }
 }

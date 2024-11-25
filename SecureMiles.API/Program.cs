@@ -11,6 +11,15 @@ using SecureMiles.Repositories.Vehicle;
 using SecureMiles.Services.Vehicle;
 using SecureMiles.Repositories.Policy;
 using SecureMiles.Services.Policy;
+using SecureMiles.Repositories.Proposals;
+using SecureMiles.Services.Proposals;
+using SecureMiles.Repositories.Claims;
+using SecureMiles.Services.Claims;
+using SecureMiles.API.Cloudinary;
+using SecureMiles.Services.Cloudinary;
+using SecureMiles.Repositories.Documents;
+using SecureMiles.Services.Document;
+using SecureMiles.Services.Mail;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -93,6 +102,15 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
+
+//cloudinary configuration
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
+builder.Services.AddSingleton<CloudinaryService>();
+
+// email configuration
+builder.Services.AddSingleton<EmailService>();
+
+
 // Register DbContext with migrations assembly
 builder.Services.AddDbContext<InsuranceContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -102,12 +120,17 @@ builder.Services.AddDbContext<InsuranceContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
 builder.Services.AddScoped<IPolicyRepository, PolicyRepository>();
+builder.Services.AddScoped<IProposalsRepository, ProposalsRepository>();
+builder.Services.AddScoped<IClaimRepository, ClaimRepository>();
+builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 
 // Register services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IPolicyServices, PolicyService>();
-
+builder.Services.AddScoped<IProposalService, ProposalService>();
+builder.Services.AddScoped<IClaimService, ClaimService>();
+builder.Services.AddScoped<IDocumentService, DocumentService>();
 
 var app = builder.Build();
 

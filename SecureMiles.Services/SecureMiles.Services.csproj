@@ -8,5 +8,10 @@
     <ProjectReference Include="..\SecureMiles.Common\SecureMiles.Common.csproj" />
     <ProjectReference Include="..\SecureMiles.Models\SecureMiles.Models.csproj" />
     <ProjectReference Include="..\SecureMiles.Repositories\SecureMiles.Repositories.csproj" />
+   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CloudinaryDotNet" Version="1.26.2" />
+    <PackageReference Include="MailKit" Version="4.8.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.0" />
   </ItemGroup>
 </Project>

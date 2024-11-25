@@ -14,5 +14,7 @@ namespace SecureMiles.Services
         Task<UserProfileResponseDto> GetUserProfileAsync(int userId);
 
         Task DeleteUserAsync(int userId);
+        Task<ForgotPasswordResponseDto> InitiatePasswordResetAsync(ForgotPasswordRequestDto request);
+        Task<ResetPasswordResponseDto> ResetPasswordAsync(ResetPasswordRequestDto request);
     }
 }

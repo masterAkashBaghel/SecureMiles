@@ -14,6 +14,16 @@ namespace SecureMiles.Repositories
 
         Task UpdateUserAsync(User user);
 
+        Task AddResetTokenAsync(PasswordResetToken token);
+        Task<PasswordResetToken?> GetValidTokenAsync(string token);
+
+        Task MarkTokenAsUsedAsync(PasswordResetToken token);
+
+
+        Task UpdateUserPasswordAsync(int userId, string hashedPassword);
+
+
+
 
     }
 }
