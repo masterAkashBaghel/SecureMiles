@@ -20,6 +20,8 @@ using SecureMiles.Services.Cloudinary;
 using SecureMiles.Repositories.Documents;
 using SecureMiles.Services.Document;
 using SecureMiles.Services.Mail;
+using SecureMiles.Repositories.Admin;
+using SecureMiles.Services.Admin;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -123,7 +125,7 @@ builder.Services.AddScoped<IPolicyRepository, PolicyRepository>();
 builder.Services.AddScoped<IProposalsRepository, ProposalsRepository>();
 builder.Services.AddScoped<IClaimRepository, ClaimRepository>();
 builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
-
+builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 // Register services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
@@ -131,6 +133,7 @@ builder.Services.AddScoped<IPolicyServices, PolicyService>();
 builder.Services.AddScoped<IProposalService, ProposalService>();
 builder.Services.AddScoped<IClaimService, ClaimService>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 
 var app = builder.Build();
 

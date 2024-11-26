@@ -23,17 +23,15 @@ namespace SecureMiles.Services.Cloudinary
 
         public async Task<ImageUploadResult> UploadFileAsync(IFormFile file, string folder)
         {
-            using (var stream = file.OpenReadStream())
+            using var stream = file.OpenReadStream();
+            var uploadParams = new ImageUploadParams
             {
-                var uploadParams = new ImageUploadParams
-                {
-                    File = new FileDescription(file.FileName, stream),
-                    Folder = folder
-                };
+                File = new FileDescription(file.FileName, stream),
+                Folder = folder
+            };
 
-                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-                return uploadResult;
-            }
+            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+            return uploadResult;
         }
 
         public async Task DeleteFileAsync(string publicId, string folder = null)

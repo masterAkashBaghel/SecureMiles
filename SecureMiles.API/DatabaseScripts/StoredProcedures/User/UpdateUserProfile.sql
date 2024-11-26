@@ -64,13 +64,9 @@ BEGIN
 END;
 GO
 
--- SELECT *
--- from Vehicles  ;
 
--- UPDATE Vehicles
--- SET IsActive = 1
--- WHERE IsActive = 0
-
+SELECT *
+FROM Users
  
 
 

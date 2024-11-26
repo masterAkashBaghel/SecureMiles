@@ -12,6 +12,7 @@ namespace SecureMiles.Services.Claims
         private readonly IClaimRepository _claimRepository;
         private readonly IPolicyRepository _policyRepository;
 
+
         public ClaimService(IClaimRepository claimRepository, IPolicyRepository policyRepository)
         {
             _claimRepository = claimRepository;
