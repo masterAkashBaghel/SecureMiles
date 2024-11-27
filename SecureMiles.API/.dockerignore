@@ -1,0 +1,7 @@
+# Ignore unnecessary files and folders
+bin/
+obj/
+*.db
+*.log
+node_modules/
+.env
