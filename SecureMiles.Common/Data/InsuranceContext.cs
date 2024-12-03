@@ -86,7 +86,7 @@ namespace SecureMiles.Common.Data
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.Policy)
                 .WithMany(pl => pl.Payments)
-                .HasForeignKey(p => p.PolicyID)
+                .HasForeignKey(p => p.PolicyId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // Policy -> Claims (One-to-Many)

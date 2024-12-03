@@ -55,10 +55,3 @@ project.fragment.lock.json
 # Azure and hosting artifacts
 .localhistory/
 *.publishsettings
-/SecureMiles.sln
-/SecureMiles.sln
-
-# PayPal credentials (if using environment variables or secrets.json)
-secrets.json
-
-.vs/
