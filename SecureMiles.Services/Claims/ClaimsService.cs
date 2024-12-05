@@ -4,6 +4,7 @@ using SecureMiles.Common.DTOs;
 using SecureMiles.Common.DTOs.Claims;
 using SecureMiles.Repositories.Policy;
 using static SecureMiles.Common.DTOs.Claims.ClaimDetailsDto;
+using Microsoft.Extensions.Logging;
 
 namespace SecureMiles.Services.Claims
 {
@@ -12,11 +13,14 @@ namespace SecureMiles.Services.Claims
         private readonly IClaimRepository _claimRepository;
         private readonly IPolicyRepository _policyRepository;
 
+        private readonly ILogger<ClaimService> _logger;
 
-        public ClaimService(IClaimRepository claimRepository, IPolicyRepository policyRepository)
+
+        public ClaimService(IClaimRepository claimRepository, IPolicyRepository policyRepository, ILogger<ClaimService> logger)
         {
             _claimRepository = claimRepository;
             _policyRepository = policyRepository;
+            _logger = logger;
         }
 
 
@@ -155,6 +159,8 @@ namespace SecureMiles.Services.Claims
             {
                 throw new UnauthorizedAccessException("Only admins can approve claims.");
             }
+            _logger.LogWarning("Approving claim {ClaimId} with amount {ClaimAmount}.", claimId, request);
+
 
             return await _claimRepository.ApproveClaimAsync(claimId, request);
         }

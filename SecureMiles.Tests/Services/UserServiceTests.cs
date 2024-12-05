@@ -25,7 +25,7 @@ public class UserServiceTests
         _userRepositoryMock = new Mock<IUserRepository>();
         _configurationMock = new Mock<IConfiguration>();
         _loggerMock = new Mock<ILogger<UserService>>();
-        _userService = new UserService(_userRepositoryMock.Object, _configurationMock.Object, _loggerMock.Object);
+        _userService = new UserService(_userRepositoryMock.Object, _configurationMock.Object, _loggerMock.Object, null);
         _userServiceMock = new Mock<UserService>(_userRepositoryMock.Object, _configurationMock.Object, _loggerMock.Object);
 
     }

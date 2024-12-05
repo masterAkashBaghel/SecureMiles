@@ -79,6 +79,7 @@ namespace SecureMiles.Repositories.Claims
             command.Parameters.Add(new SqlParameter("@ClaimId", claimId));
             command.Parameters.Add(new SqlParameter("@ApprovedAmount", request.ApprovedAmount));
             command.Parameters.Add(new SqlParameter("@ApprovalDate", DateTime.UtcNow));
+            command.Parameters.Add(new SqlParameter("@Notes", request.Notes ?? (object)DBNull.Value));
 
             await _context.Database.OpenConnectionAsync();
 
