@@ -22,12 +22,18 @@ using SecureMiles.Services.Document;
 using SecureMiles.Services.Mail;
 using SecureMiles.Repositories.Admin;
 using SecureMiles.Services.Admin;
+using SecureMiles.Repositories.Payment;
+using SecureMiles.Services.Payment;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped<PayPalService>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<IPayPalService, PayPalService>();
+
 builder.Services.AddSwaggerGen(c =>
 {
     // Add a security definition for Bearer token
