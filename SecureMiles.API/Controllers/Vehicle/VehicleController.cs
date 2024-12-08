@@ -34,14 +34,22 @@ namespace SecureMiles.API.Controllers.Vehicle
 
             try
             {
+                // Retrieve User ID from claims
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (!int.TryParse(userIdClaim, out var userId))
                 {
                     _logger.LogWarning("Invalid user ID claim: {UserIdClaim}", userIdClaim);
                     return Unauthorized(new { Error = "Invalid user ID." });
                 }
-                await _vehicleService.AddVehicleAsync(userId, request);
-                return Ok(new { Message = "Vehicle added successfully." }); // Return success message
+
+                // Add vehicle and fetch policy options
+                var policyOptions = await _vehicleService.AddVehicleAsync(userId, request);
+
+                return Ok(new
+                {
+                    Message = "Vehicle added successfully.",
+                    Policies = policyOptions // Return policy options in the response
+                });
             }
             catch (Exception ex)
             {

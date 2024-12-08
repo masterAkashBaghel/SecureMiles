@@ -24,6 +24,7 @@ namespace SecureMiles.API.Controllers.Documents
         [Authorize]
         public async Task<IActionResult> UploadDocument([FromForm] UploadDocumentRequestDto request)
         {
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -44,6 +45,7 @@ namespace SecureMiles.API.Controllers.Documents
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Unauthorized access or user not found for document upload.");
+
                 return BadRequest(new { Error = ex.Message });
             }
             catch (Exception ex)

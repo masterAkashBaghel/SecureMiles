@@ -64,6 +64,17 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// Add CORS services
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
 // logger configuration
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration) // Read from appsettings.json
@@ -78,7 +89,6 @@ Log.Logger = new LoggerConfiguration()
 
 // Replace the default logging with Serilog
 builder.Host.UseSerilog();
-
 
 // JWT Configuration
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -110,14 +120,12 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-
 //cloudinary configuration
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
 builder.Services.AddSingleton<CloudinaryService>();
 
 // email configuration
 builder.Services.AddSingleton<EmailService>();
-
 
 // Register DbContext with migrations assembly
 builder.Services.AddDbContext<InsuranceContext>(options =>
@@ -156,6 +164,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Use CORS middleware
+app.UseCors("AllowAll");
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
