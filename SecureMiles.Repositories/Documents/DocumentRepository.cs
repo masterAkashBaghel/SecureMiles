@@ -16,17 +16,59 @@ namespace SecureMiles.Repositories.Documents
         // Add the document to the database
         public async Task<UploadDocumentResponseDto> AddAsync(Models.Document document)
         {
-            // Add the document to the database
-            await _context.Documents.AddAsync(document);
-            await _context.SaveChangesAsync();
+            // make it such if it has matching claim id or proposal id then update the document
 
-            // Return the response DTO after saving
-            return new UploadDocumentResponseDto
+            // find if there is a document with the same claim id or proposal id
+            var existingDocument = await _context.Documents.FirstOrDefaultAsync(d =>
+                (d.ClaimID == document.ClaimID || d.ProposalID == document.ProposalID) &&
+                d.Type == document.Type);
+
+            if (existingDocument != null)
             {
-                DocumentUrl = document.FilePath, // The Cloudinary URL
-                DocumentType = document.Type,    // Document type like IDProof or VehicleRC
-                UploadedAt = document.UploadedDate // Timestamp of document upload
-            };
+
+                // update the existing document
+                existingDocument.FilePath = document.FilePath;
+                existingDocument.UploadedDate = document.UploadedDate;
+
+                await _context.SaveChangesAsync();
+
+                return new UploadDocumentResponseDto
+                {
+                    DocumentUrl = existingDocument.FilePath, // The Cloudinary URL
+                    DocumentType = existingDocument.Type,    // Document type like IDProof or VehicleRC
+                    UploadedAt = existingDocument.UploadedDate // Timestamp of document upload
+                };
+            }
+            else
+            {
+                // Add the document to the database
+                await _context.Documents.AddAsync(document);
+                await _context.SaveChangesAsync();
+
+                // Return the response DTO after saving
+                return new UploadDocumentResponseDto
+                {
+                    DocumentUrl = document.FilePath, // The Cloudinary URL
+                    DocumentType = document.Type,    // Document type like IDProof or VehicleRC
+                    UploadedAt = document.UploadedDate // Timestamp of document upload
+                };
+            }
+
+
+
+
+
+            // // Add the document to the database
+            // await _context.Documents.AddAsync(document);
+            // await _context.SaveChangesAsync();
+
+            // // Return the response DTO after saving
+            // return new UploadDocumentResponseDto
+            // {
+            //     DocumentUrl = document.FilePath, // The Cloudinary URL
+            //     DocumentType = document.Type,    // Document type like IDProof or VehicleRC
+            //     UploadedAt = document.UploadedDate // Timestamp of document upload
+            // };
         }
 
 

@@ -34,8 +34,7 @@ namespace SecureMiles.Services.Payment
                 payer = new Payer { payment_method = "paypal" },
                 transactions = new List<Transaction>
                 {
-                    new Transaction
-                    {
+                    new() {
                         amount = new Amount
                         {
                             currency = currency,

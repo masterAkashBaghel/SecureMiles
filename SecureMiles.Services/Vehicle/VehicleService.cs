@@ -1,6 +1,7 @@
 
 
 using Microsoft.Extensions.Logging;
+using SecureMiles.Common.DTOs.Policy;
 using SecureMiles.Common.DTOs.Vehicle;
 using SecureMiles.Repositories;
 using SecureMiles.Repositories.Vehicle;
@@ -19,7 +20,7 @@ namespace SecureMiles.Services.Vehicle
             _userRepository = userRepository;
         }
 
-        public async Task AddVehicleAsync(int userId, AddVehicleRequestDto request)
+        public async Task<IEnumerable<PolicyOptionDto>> AddVehicleAsync(int userId, AddVehicleRequestDto request)
         {
             // Validate the request
             if (request == null)
@@ -27,15 +28,16 @@ namespace SecureMiles.Services.Vehicle
                 _logger.LogWarning("Invalid vehicle request: {Request}", request);
                 throw new ArgumentNullException(nameof(request));
             }
+
+            // Fetch user details
             var user = await _userRepository.GetUserByIdAsync(userId);
-            // Retrieve the user entity
             if (user == null)
             {
                 _logger.LogWarning("User not found: {UserId}", userId);
                 throw new ArgumentException("User not found", nameof(userId));
             }
 
-            // Create a new vehicle entity
+            // Create the vehicle entity
             var vehicle = new Models.Vehicle
             {
                 Make = request.Make,
@@ -54,9 +56,58 @@ namespace SecureMiles.Services.Vehicle
                 Proposals = [],
             };
 
-            // Add the vehicle to the database
+            // Save the vehicle
             await _vehicleRepository.AddVehicleAsync(userId, vehicle);
+            _logger.LogInformation("Vehicle added successfully for User ID: {UserId}", userId);
+
+            // Generate policy options
+            return GeneratePolicyOptions(vehicle);
         }
+
+        public IEnumerable<PolicyOptionDto> GeneratePolicyOptions(Models.Vehicle vehicle)
+        {
+            // Example logic for generating policy options
+            decimal baseCoverage = vehicle.MarketValue * 0.75m;
+            decimal basePremium = baseCoverage * 0.02m;
+
+            return new List<PolicyOptionDto>
+    {
+        new() {
+            VehicleID = vehicle.VehicleID,
+            PolicyType = "Comprehensive",
+            CoverageAmount = baseCoverage,
+            PremiumAmount = basePremium + 500,
+            AddOns = new List<string> { "Roadside Assistance", "Engine Protection" },
+            PolicyName = "Comprehensive Policy",
+            PolicyDescription = "This policy provides coverage for all types of damages to your vehicle.",
+            PolicyTerms = "Policy terms and conditions apply.",
+            PolicyCoverage = "Covers damages due to accidents, theft, fire, and natural calamities."
+        },
+        new() {
+            VehicleID = vehicle.VehicleID,
+            PolicyType = "Third-Party",
+            CoverageAmount = baseCoverage * 0.6m,
+            PremiumAmount = basePremium * 0.6m,
+            AddOns = new List<string>(),
+            PolicyName = "Third-Party Policy",
+            PolicyDescription = "This policy provides coverage for damages caused to third-party vehicles.",
+            PolicyTerms = "Policy terms and conditions apply.",
+            PolicyCoverage = "Covers damages caused to third-party vehicles in case of an accident."
+        },
+        new() {
+            VehicleID = vehicle.VehicleID,
+            PolicyType = "Fire and Theft",
+            CoverageAmount = baseCoverage * 0.8m,
+            PremiumAmount = basePremium * 0.8m + 300,
+            AddOns = new List<string> { "Theft Protection" },
+            PolicyName = "Fire and Theft Policy",
+            PolicyDescription = "This policy provides coverage for damages due to fire and theft.",
+            PolicyTerms = "Policy terms and conditions apply.",
+            PolicyCoverage = "Covers damages due to fire and theft of the vehicle."
+        }
+    };
+        }
+
         public async Task<List<VehicleResponseDto>> GetVehiclesByUserIdAsync(int userId)
         {
             var vehicles = await _vehicleRepository.GetVehiclesByUserIdAsync(userId);

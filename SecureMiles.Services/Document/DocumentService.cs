@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SecureMiles.Common.DTOs.Documents;
 using SecureMiles.Repositories.Claims;
 using SecureMiles.Repositories.Documents;
@@ -39,25 +41,31 @@ namespace SecureMiles.Services.Document
                 throw new InvalidOperationException("Document upload failed.");
             }
             // get related claim or proposal
-            if (request.ClaimID == null && request.ProposalID == null)
+
+            Models.Claim? claim = null;
+            Models.Proposal? proposal = null;
+
+            if (request.ClaimID.HasValue)
             {
-                throw new InvalidOperationException("ClaimID or ProposalID is required.");
+                claim = await _ClaimRepository.GetClaimByIdAsync(request.ClaimID.Value, userId)!;
+                if (claim == null)
+                {
+                    throw new KeyNotFoundException("Claim not found.");
+                }
             }
-            // retrive claim or proposal from database
 
-
-            var claim = await _ClaimRepository.GetClaimByIdAsync(request.ClaimID.Value, userId);
-            if (claim == null)
+            if (request.ProposalID.HasValue)
             {
-                throw new KeyNotFoundException("Claim not found.");
+                proposal = await _ProposalRepository.GetProposalByIdAsync(request.ProposalID.Value, userId);
+                if (proposal == null)
+                {
+                    throw new KeyNotFoundException("Proposal not found.");
+                }
             }
 
 
-            var proposal = await _ProposalRepository.GetProposalByIdAsync(request.ProposalID.Value);
-            if (proposal == null)
-            {
-                throw new KeyNotFoundException("Proposal not found.");
-            }
+
+
 
 
 

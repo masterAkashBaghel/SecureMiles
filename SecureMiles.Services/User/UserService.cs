@@ -91,10 +91,10 @@ namespace SecureMiles.Services
 
             var claims = new List<System.Security.Claims.Claim>
             {
-                new System.Security.Claims.Claim(JwtRegisteredClaimNames.Sub, user.UserID.ToString()),
-                new System.Security.Claims.Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new System.Security.Claims.Claim(ClaimTypes.Role, user.Role), // Include Role
-                new System.Security.Claims.Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new(JwtRegisteredClaimNames.Sub, user.UserID.ToString()),
+                new(JwtRegisteredClaimNames.Email, user.Email),
+                new(ClaimTypes.Role, user.Role), // Include Role
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
             var credentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);

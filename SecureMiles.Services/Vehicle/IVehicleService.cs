@@ -1,12 +1,12 @@
 
+using SecureMiles.Common.DTOs.Policy;
 using SecureMiles.Common.DTOs.Vehicle;
 
 namespace SecureMiles.Services.Vehicle
 {
     public interface IVehicleService
     {
-        Task AddVehicleAsync(int userId, AddVehicleRequestDto request);
-
+        Task<IEnumerable<PolicyOptionDto>> AddVehicleAsync(int userId, AddVehicleRequestDto request);
         Task<List<VehicleResponseDto>> GetVehiclesByUserIdAsync(int userId);
 
         Task<VehicleDetailsResponseDto> GetVehicleDetailsAsync(int vehicleId, int userId);
@@ -14,6 +14,8 @@ namespace SecureMiles.Services.Vehicle
         Task<bool> UpdateVehicleAsync(int vehicleId, int userId, UpdateVehicleRequestDto vehicleDto);
 
         Task<bool> DeleteVehicleAsync(int vehicleId, int userId);
+
+        IEnumerable<PolicyOptionDto> GeneratePolicyOptions(Models.Vehicle vehicle);
 
     }
 }

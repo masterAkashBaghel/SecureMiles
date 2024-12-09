@@ -48,7 +48,7 @@ namespace SecureMiles.Repositories.Proposals
         {
             return await _context.Proposals
                 .Include(p => p.Vehicle) // Include vehicle details
-                .Where(p => p.UserID == userId)
+                .Where(p => p.UserID == userId && p.Status != "Canceled") // Filter out canceled proposals
                 .OrderByDescending(p => p.SubmissionDate) // Order by latest proposals
                 .ToListAsync();
         }
