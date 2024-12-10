@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SecureMiles.Common.Data;
 
@@ -11,9 +12,11 @@ using SecureMiles.Common.Data;
 namespace SecureMiles.API.Migrations
 {
     [DbContext(typeof(InsuranceContext))]
-    partial class InsuranceContextModelSnapshot : ModelSnapshot
+    [Migration("20241210105758_UpdateProposalSchema")]
+    partial class UpdateProposalSchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -270,9 +273,6 @@ namespace SecureMiles.API.Migrations
 
                     b.Property<string>("PolicyType")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("PremiumAmount")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("RequestedCoverage")
                         .HasColumnType("decimal(18, 2)");

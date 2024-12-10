@@ -54,6 +54,8 @@ namespace SecureMiles.Services.Proposals
                 User = eUser,// Set the required User property
                 Documents = [], // Initialize the Documents list
                 Policy = null,
+                PolicyType = request.PolicyType,
+                PremiumAmount = (decimal)request.PremiumAmount
 
             };
 
@@ -82,6 +84,9 @@ namespace SecureMiles.Services.Proposals
                 RequestedCoverage = p.RequestedCoverage,
                 Status = p.Status,
                 SubmissionDate = p.SubmissionDate,
+                PremiumAmount = p.PremiumAmount,
+                PolicyType = p.PolicyType
+
             }).ToList();
         }
         public async Task<ProposalDetailsResponseDto> GetProposalByIdAsync(int proposalId, int userId)

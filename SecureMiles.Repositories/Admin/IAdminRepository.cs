@@ -16,5 +16,15 @@ namespace SecureMiles.Repositories.Admin
         Task<(IEnumerable<AdminClaimResponseDto>, int)> GetAllClaimsForReviewAsync(int pageNumber, int pageSize);
 
         Task<(IEnumerable<AdminPolicyResponseDto>, int)> GetAllPoliciesAsync(int pageNumber, int pageSize);
+
+        Task<DashboardDataResponseDto> GetDashboardDataAsync();
+
+        Task<PaginatedProposalsResponseDto> GetAllProposalsAsync(int pageNumber, int pageSize);
+
+        Task<ProposalDetailsResponseDto?> GetProposalDetailsAsync(int proposalId);
+
+        Task DeleteProposalAsync(int proposalId);
+
+        Task ApproveProposalAsync(int proposalId);
     }
 }

@@ -9,7 +9,7 @@ BEGIN
     -- Fetch user details
     SELECT
         u.UserID, u.Name, u.Address, u.City, u.State,
-        u.ZipCode, u.CreatedAt, u.UpdatedAt
+        u.ZipCode, u.CreatedAt, u.UpdatedAt, u.Email, u.Phone, u.Role
     FROM Users u
     WHERE u.UserID = @UserId;
 

@@ -10,6 +10,10 @@ namespace SecureMiles.Common.DTOs.Proposals
         public decimal RequestedCoverage { get; set; }
         public string? Status { get; set; } // Pending, Approved, Rejected
         public DateTime SubmissionDate { get; set; }
+
+        public decimal? PremiumAmount { get; set; }
+
+        public string? PolicyType { get; set; }
     }
 
 

@@ -50,6 +50,8 @@ namespace SecureMiles.Repositories.Admin
                 userDetails.UserId = reader.GetInt32("UserID");
                 userDetails.Name = reader.GetString("Name");
                 userDetails.Address = reader.GetString("Address");
+                userDetails.Phone = reader.GetString("Phone");
+                userDetails.Email = reader.GetString("Email");
                 userDetails.City = reader.GetString("City");
                 userDetails.State = reader.GetString("State");
                 userDetails.ZipCode = reader.GetString("ZipCode");
@@ -249,5 +251,136 @@ namespace SecureMiles.Repositories.Admin
             return (policies, totalCount);
         }
 
+        // method to get total policy,user,claim and proposals without using stored procedure
+
+        public async Task<DashboardDataResponseDto> GetDashboardDataAsync()
+        {
+            var totalUsers = await _context.Users.CountAsync();
+            var totalPolicies = await _context.Policies.CountAsync();
+            var totalClaims = await _context.Claims.CountAsync();
+            var totalProposals = await _context.Proposals.CountAsync();
+
+            return new DashboardDataResponseDto
+            {
+                TotalUsers = totalUsers,
+                TotalPolicies = totalPolicies,
+                TotalClaims = totalClaims,
+                TotalProposals = totalProposals
+            };
+        }
+
+        // method to get all proposals for review without using stored procedure
+
+        public async Task<PaginatedProposalsResponseDto> GetAllProposalsAsync(int pageNumber, int pageSize)
+        {
+            var query = _context.Proposals
+                .Include(p => p.Policy)
+                .Include(p => p.User)
+                .OrderBy(p => p.CreatedAt);
+
+            var totalCount = await query.CountAsync();
+            var proposals = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new ProposalResponseDto
+                {
+                    ProposalId = p.ProposalID,
+                    PolicyName = p.Policy.Type,
+                    UserName = p.User.Name,
+                    UserEmail = p.User.Email,
+                    UserPhone = p.User.Phone,
+                    Status = p.Status,
+                    UserId = p.UserID,
+                    CreatedAt = p.CreatedAt
+                })
+                .ToListAsync();
+
+            return new PaginatedProposalsResponseDto
+            {
+                Proposals = proposals,
+                TotalCount = totalCount,
+                CurrentPage = pageNumber,
+                PageSize = pageSize
+            };
+        }
+        // method to get all details of a proposal without using stored procedure
+
+        public async Task<ProposalDetailsResponseDto?> GetProposalDetailsAsync(int proposalId)
+        {
+            var proposal = await _context.Proposals
+                .Include(p => p.Policy)
+                .Include(p => p.User)
+                .Include(p => p.Vehicle)
+                .Include(p => p.Documents)
+                .FirstOrDefaultAsync(p => p.ProposalID == proposalId);
+
+            if (proposal == null)
+            {
+                return null;
+            }
+
+            return new ProposalDetailsResponseDto
+            {
+                ProposalId = proposal.ProposalID,
+                UserId = proposal.UserID,
+                UserName = proposal.User.Name,
+                UserEmail = proposal.User.Email,
+                UserPhone = proposal.User.Phone,
+                Status = proposal.Status,
+                CreatedAt = proposal.CreatedAt,
+                ApprovalDate = proposal.ApprovalDate,
+                SubmissionDate = proposal.SubmissionDate,
+                RequestedCoverage = proposal.RequestedCoverage,
+                Vehicle = new VehicleDto
+                {
+                    VehicleId = proposal.Vehicle.VehicleID,
+                    Make = proposal.Vehicle.Make,
+                    Model = proposal.Vehicle.Model,
+                    Year = proposal.Vehicle.Year,
+                },
+                Documents = proposal.Documents
+            .Where(d => d.ProposalID == proposalId)
+            .Select(d => new DocumentDto
+            {
+                DocumentId = d.DocumentID,
+                DocumentType = d.Type,
+                DocumentUrl = d.FilePath
+            }).ToList()
+            };
+        }
+
+        // method to delete a proposal by admin without using stored procedure
+
+        public async Task DeleteProposalAsync(int proposalId)
+        {
+            var proposal = await _context.Proposals.FindAsync(proposalId);
+            if (proposal == null)
+            {
+                throw new KeyNotFoundException("Proposal not found.");
+            }
+
+            _context.Proposals.Remove(proposal);
+            await _context.SaveChangesAsync();
+
+        }
+
+        // method to approve  proposal by admin
+
+        public async Task ApproveProposalAsync(int proposalId)
+        {
+            var proposal = await _context.Proposals.FindAsync(proposalId);
+            if (proposal == null)
+            {
+                throw new KeyNotFoundException("Proposal not found.");
+            }
+
+            proposal.Status = "Approved";
+            proposal.ApprovalDate = DateTime.UtcNow;
+            _context.Proposals.Update(proposal);
+            await _context.SaveChangesAsync();
+
+
+
+        }
     }
 }
