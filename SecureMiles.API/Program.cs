@@ -22,17 +22,20 @@ using SecureMiles.Services.Document;
 using SecureMiles.Services.Mail;
 using SecureMiles.Repositories.Admin;
 using SecureMiles.Services.Admin;
-using SecureMiles.Repositories.Payment;
-using SecureMiles.Services.Payment;
+// using SecureMiles.Repositories.Payment;
+// using SecureMiles.Services.Payment;
+using SecureMiles.Services.FakePayment;
+using SecureMiles.Repositories.FakePayment;
+
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddScoped<PayPalService>();
-builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+// builder.Services.AddScoped<PayPalService>();
+// builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddScoped<IPayPalService, PayPalService>();
+// builder.Services.AddScoped<IPayPalService, PayPalService>();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -140,6 +143,8 @@ builder.Services.AddScoped<IProposalsRepository, ProposalsRepository>();
 builder.Services.AddScoped<IClaimRepository, ClaimRepository>();
 builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+
 // Register services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
@@ -148,7 +153,7 @@ builder.Services.AddScoped<IProposalService, ProposalService>();
 builder.Services.AddScoped<IClaimService, ClaimService>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
-
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline

@@ -34,3 +34,10 @@ BEGIN
 END;
 GO
 
+select *
+from Proposals
+where ProposalID = 21
+
+delete from Policies where PolicyID = 4
+
+ 
