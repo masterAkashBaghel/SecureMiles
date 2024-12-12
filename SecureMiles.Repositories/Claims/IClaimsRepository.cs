@@ -12,5 +12,6 @@ namespace SecureMiles.Repositories.Claims
         Task<UpdateClaimResponseDto> UpdateClaimAsync(int claimId, int userId, bool isAdmin, UpdateClaimRequestDto request);
         Task<ApproveClaimResponseDto> ApproveClaimAsync(int claimId, ApproveClaimRequestDto request);
         Task<Claim> RejectClaimAsync(int claimId, string notes);
+        Task<Claim> UpdateClaimAsync(Claim claim);
     }
 }

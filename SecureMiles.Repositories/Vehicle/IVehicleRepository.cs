@@ -16,5 +16,7 @@ namespace SecureMiles.Repositories.Vehicle
         Task<bool> DeleteVehicleAsync(int vehicleId, int userId);
         Task<Models.Vehicle?> GetVehicleEntityAsync(int vehicleId, int userId);
 
+        Task<List<Models.Vehicle>> GetVehiclesByTypeAsync(int userId, string type);
+
     }
 }

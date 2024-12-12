@@ -13,6 +13,7 @@ namespace SecureMiles.Models
         public int PolicyId { get; set; } // Foreign Key to Policy
         public DateTime CreatedAt { get; set; }
 
+
         public Policy? Policy { get; set; } // Add this navigation property
 
     }

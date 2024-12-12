@@ -1,10 +1,10 @@
 using SecureMiles.Models;
 using SecureMiles.Repositories.Claims;
-using SecureMiles.Common.DTOs;
 using SecureMiles.Common.DTOs.Claims;
 using SecureMiles.Repositories.Policy;
 using static SecureMiles.Common.DTOs.Claims.ClaimDetailsDto;
 using Microsoft.Extensions.Logging;
+using SecureMiles.Services.Document;
 
 namespace SecureMiles.Services.Claims
 {
@@ -13,16 +13,18 @@ namespace SecureMiles.Services.Claims
         private readonly IClaimRepository _claimRepository;
         private readonly IPolicyRepository _policyRepository;
 
+        private readonly IDocumentService _documentService;
+
         private readonly ILogger<ClaimService> _logger;
 
 
-        public ClaimService(IClaimRepository claimRepository, IPolicyRepository policyRepository, ILogger<ClaimService> logger)
+        public ClaimService(IClaimRepository claimRepository, IPolicyRepository policyRepository, ILogger<ClaimService> logger, IDocumentService documentService)
         {
             _claimRepository = claimRepository;
             _policyRepository = policyRepository;
             _logger = logger;
+            _documentService = documentService;
         }
-
 
         public async Task<FileClaimResponseDto> FileClaimAsync(int userId, FileClaimRequestDto request)
         {
@@ -54,12 +56,29 @@ namespace SecureMiles.Services.Claims
                 Status = "Pending", // Initial status
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                Documents = [],
-                Policy = policy
+                Documents = new List<Models.Document>(),
+                Policy = policy,
+                ClaimAmount = string.IsNullOrEmpty(request.ClaimAmount) ? (decimal?)null : decimal.Parse(request.ClaimAmount)
             };
 
             // Add the claim to the database
             var claimId = await _claimRepository.AddClaimAsync(claim);
+
+            // Save the document if it exists
+            if (request.DocumentFile != null)
+            {
+                var documentResponse = await _documentService.SaveDocumentForClaimAsync(claimId, userId, request.DocumentFile);
+
+                if (documentResponse == null)
+                {
+                    throw new InvalidOperationException("Document upload failed.");
+                }
+
+                claim.Documents.Add(documentResponse);
+
+                // Update the claim in the database with the document reference
+                await _claimRepository.UpdateClaimAsync(claim);
+            }
 
             return new FileClaimResponseDto
             {
@@ -70,8 +89,6 @@ namespace SecureMiles.Services.Claims
                 PremiumAmount = policy.PremiumAmount
             };
         }
-
-
         public async Task<List<ClaimResponseDto>> GetClaimsAsync(int userId)
         {
             var claims = await _claimRepository.GetClaimsByUserIdAsync(userId);
@@ -126,21 +143,34 @@ namespace SecureMiles.Services.Claims
                 ApprovalDate = claim.ApprovalDate,
                 CreatedAt = claim.CreatedAt,
                 UpdatedAt = claim.UpdatedAt,
-                Policy = new PolicyDetailsDto
+                Policy = claim.Policy != null ? new PolicyDetailsDto
                 {
                     PolicyId = claim.Policy.PolicyID,
                     PolicyType = claim.Policy.Type,
                     CoverageAmount = claim.Policy.CoverageAmount,
                     PremiumAmount = claim.Policy.PremiumAmount,
                     PolicyStartDate = claim.Policy.PolicyStartDate,
-                    PolicyEndDate = claim.Policy.PolicyEndDate
-                },
+                } : null
+                ,
                 Documents = claim.Documents.Select(d => new DocumentDetailsDto
                 {
                     DocumentId = d.DocumentID,
                     Type = d.Type,
                     FilePath = d.FilePath
-                }).ToList()
+                }).ToList(),
+
+                // also include vehicle details
+                Vehicle = claim.Policy?.Vehicle != null ? new ClaimVehicleDto
+                {
+                    VehicleId = claim.Policy.Vehicle.VehicleID,
+                    RegistrationNumber = claim.Policy.Vehicle.RegistrationNumber,
+                    Model = claim.Policy.Vehicle.Model,
+                    Year = claim.Policy.Vehicle.Year,
+                    FuelType = claim.Policy.Vehicle.FuelType,
+                    EngineNumber = claim.Policy.Vehicle.EngineNumber,
+                    ChassisNumber = claim.Policy.Vehicle.ChassisNumber
+                } : null
+
             };
         }
         public async Task<UpdateClaimResponseDto> UpdateClaimAsync(int claimId, int userId, bool isAdmin, UpdateClaimRequestDto request)

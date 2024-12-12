@@ -181,5 +181,13 @@ namespace SecureMiles.Repositories.Vehicle
             return vehicle;
         }
 
+
+        // get vehicle by type
+        public async Task<List<Models.Vehicle>> GetVehiclesByTypeAsync(int userId, string type)
+        {
+            return await _context.Vehicles
+                .Where(v => v.UserID == userId && v.IsActive && v.Type == type)
+                .ToListAsync();
+        }
     }
 }

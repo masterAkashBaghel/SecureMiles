@@ -11,5 +11,8 @@ namespace SecureMiles.Repositories.Proposals
 
         Task<Models.Proposal> GetProposalByIdAsync(int proposalId, int userId);
         Task<bool> CancelProposalAsync(int proposalId, int userId);
+
+
+        Task<bool> UpdateProposalAsync(Models.Proposal proposal);
     }
 }

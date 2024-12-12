@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SecureMiles.Common.DTOs.Documents;
 using SecureMiles.Repositories.Claims;
@@ -42,17 +43,7 @@ namespace SecureMiles.Services.Document
             }
             // get related claim or proposal
 
-            Models.Claim? claim = null;
             Models.Proposal? proposal = null;
-
-            if (request.ClaimID.HasValue)
-            {
-                claim = await _ClaimRepository.GetClaimByIdAsync(request.ClaimID.Value, userId)!;
-                if (claim == null)
-                {
-                    throw new KeyNotFoundException("Claim not found.");
-                }
-            }
 
             if (request.ProposalID.HasValue)
             {
@@ -62,22 +53,15 @@ namespace SecureMiles.Services.Document
                     throw new KeyNotFoundException("Proposal not found.");
                 }
             }
-
-
-
-
-
-
-
             // Save document information to the database 
             var document = new Models.Document
             {
-                Type = request.Type.ToString(),
+                Type = request.Type?.ToString() ?? throw new InvalidOperationException("Document type cannot be null."),
                 FilePath = uploadResult.Url.ToString(),
                 ClaimID = request.ClaimID,
                 ProposalID = request.ProposalID,
-                Proposal = proposal,
-                Claim = claim,
+                Proposal = proposal ?? throw new InvalidOperationException("Proposal cannot be null."),
+                Claim = null,
             };
 
             // Add document to database  
@@ -85,6 +69,82 @@ namespace SecureMiles.Services.Document
 
             return response;
         }
+
+        // save a documnet for claim (params claimId, userId, filepath)
+        public async Task<Models.Document> SaveDocumentForClaimAsync(int claimId, int userId, IFormFile filePath)
+        {
+            // get related claim
+            var claim = await _ClaimRepository.GetClaimByIdAsync(claimId, userId);
+            if (claim == null)
+            {
+                throw new KeyNotFoundException("Claim not found.");
+            }
+
+            // upload document to cloudinary
+            var uploadResult = await _cloudinaryService.UploadFileAsync(filePath, "documents");
+
+            if (uploadResult == null)
+            {
+                throw new InvalidOperationException("Document upload failed.");
+            }
+
+            // Save document information to the database
+            var document = new Models.Document
+            {
+                Type = "Claim",
+                FilePath = uploadResult.Url.ToString(),
+                ClaimID = claimId,
+                Claim = claim,
+                Proposal = null
+            };
+
+            // Add document to database  
+            var savedDocument = await _DocumentRepository.AddClaimDocument(document);
+
+            return savedDocument;
+        }
+
+        // save a documnet for proposal (params proposalId, userId, filepath)
+        public async Task<Models.Document> SaveDocumentForProposalAsync(int proposalId, int userId, IFormFile filePath)
+        {
+            // get related proposal
+            var proposal = await _ProposalRepository.GetProposalByIdAsync(proposalId, userId);
+            if (proposal == null)
+            {
+                throw new KeyNotFoundException("Proposal not found.");
+            }
+
+            // upload document to cloudinary
+            var uploadResult = await _cloudinaryService.UploadFileAsync(filePath, "documents");
+
+            if (uploadResult == null)
+            {
+                throw new InvalidOperationException("Document upload failed.");
+            }
+
+            // Save document information to the database
+            var document = new Models.Document
+            {
+                Type = "Proposal",
+                FilePath = uploadResult.Url.ToString(),
+                ProposalID = proposalId,
+                Proposal = proposal,
+                Claim = null
+            };
+
+            // Add document to database  
+            var savedDocument = await _DocumentRepository.AddClaimDocument(document);
+
+            return savedDocument;
+        }
+
+
+
+
+
+
+
+
         public async Task<DocumentDetailsResponseDto> GetDocumentDetailsAsync(int documentId, int userId)
         {
             var document = await _DocumentRepository.GetDocumentByIdAsync(documentId, userId);
@@ -123,6 +183,11 @@ namespace SecureMiles.Services.Document
             await _DocumentRepository.DeleteAsync(document);
         }
 
+
+
+
     }
+
+
 
 }

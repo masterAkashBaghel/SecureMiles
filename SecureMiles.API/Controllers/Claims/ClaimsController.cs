@@ -22,7 +22,7 @@ namespace SecureMiles.API.Controllers.Claims
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> FileClaim([FromBody] FileClaimRequestDto request)
+        public async Task<IActionResult> FileClaim([FromForm] FileClaimRequestDto request)
         {
             if (!ModelState.IsValid)
             {

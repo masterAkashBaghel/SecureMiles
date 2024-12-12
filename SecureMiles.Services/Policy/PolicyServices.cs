@@ -117,7 +117,33 @@ namespace SecureMiles.Services.Policy
                     Model = policy.Vehicle.Model,
                     RegistrationNumber = policy.Vehicle.RegistrationNumber,
                     VehicleType = policy.Vehicle.Type
+                },
+                Claim = policy.Claims.Any() ? new PolicyClaimDto
+                {
+                    ClaimId = policy.Claims.First().ClaimID,
+                    IncidentDate = policy.Claims.First().IncidentDate,
+                    PolicyId = policy.Claims.First().PolicyID,
+                    Status = policy.Claims.First().Status,
+                    ClaimAmount = policy.Claims.First().ClaimAmount,
+                    CreatedAt = policy.Claims.First().CreatedAt
+                } : null,
+
+                Payment = policy.Payments.Any() ? new PaymentDetailsResponseDto
+                {
+                    PaymentId = policy.Payments.First().PaymentId,
+                    Amount = policy.Payments.First().Amount,
+                    PaymentDate = policy.Payments.First().CreatedAt,
+                    TransactionId = policy.Payments.First().TransactionId
+                } : null,
+
+                User = new UserDto
+                {
+                    UserId = policy.User.UserID,
+                    Name = policy.User.Name,
+                    Email = policy.User.Email,
+                    Phone = policy.User.Phone
                 }
+
             };
         }
 

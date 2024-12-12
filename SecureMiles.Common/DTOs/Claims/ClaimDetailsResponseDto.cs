@@ -18,6 +18,8 @@ namespace SecureMiles.Common.DTOs.Claims
 
         // Associated documents
         public List<DocumentDetailsDto>? Documents { get; set; }
+
+        public ClaimVehicleDto? Vehicle { get; set; }
     }
 
 
@@ -29,5 +31,15 @@ namespace SecureMiles.Common.DTOs.Claims
         public string? FilePath { get; set; }
     }
 
+    public class ClaimVehicleDto
+    {
+        public int VehicleId { get; set; }
+        public string? RegistrationNumber { get; set; }
+        public string? Model { get; set; }
+        public int? Year { get; set; }
+        public string? FuelType { get; set; }
+        public string? ChassisNumber { get; set; }
+        public string? EngineNumber { get; set; }
+    }
 
 }

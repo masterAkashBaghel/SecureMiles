@@ -89,5 +89,14 @@ namespace SecureMiles.Repositories.Proposals
             return true;
         }
 
+
+        // method to update the proposal status
+        public async Task<bool> UpdateProposalAsync(Proposal proposal)
+        {
+            _context.Proposals.Update(proposal);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
     }
 }

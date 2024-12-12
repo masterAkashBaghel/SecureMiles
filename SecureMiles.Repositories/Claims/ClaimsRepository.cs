@@ -35,6 +35,7 @@ namespace SecureMiles.Repositories.Claims
         {
             return await _context.Claims
                 .Include(c => c.Policy) // Include policy details
+                .ThenInclude(p => p.Vehicle) // Include vehicle details from policy
                 .Include(c => c.Documents) // Include associated documents
                 .FirstOrDefaultAsync(c => c.ClaimID == claimId && c.Policy.UserID == userId);
         }
@@ -125,5 +126,12 @@ namespace SecureMiles.Repositories.Claims
             return claim;
         }
 
+        // method to update a claim
+        public async Task<Claim> UpdateClaimAsync(Claim claim)
+        {
+            _context.Claims.Update(claim);
+            await _context.SaveChangesAsync();
+            return claim;
+        }
     }
 }

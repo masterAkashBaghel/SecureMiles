@@ -15,7 +15,8 @@ namespace SecureMiles.Services.Vehicle
 
         Task<bool> DeleteVehicleAsync(int vehicleId, int userId);
 
-        IEnumerable<PolicyOptionDto> GeneratePolicyOptions(Models.Vehicle vehicle);
+        IEnumerable<PolicyOptionDto> GeneratePolicyOptions(Models.Vehicle vehicle, decimal marketValue);
 
+        Task<List<VehicleResponseDto>> GetVehiclesByTypeAsync(int userId, string type);
     }
 }
