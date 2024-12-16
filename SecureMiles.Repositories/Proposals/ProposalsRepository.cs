@@ -18,9 +18,11 @@ namespace SecureMiles.Repositories.Proposals
 
         public async Task<int> AddProposalAsync(Proposal proposal)
         {
-            await _context.Proposals.AddAsync(proposal);
+            // Add the proposal to the database and return the added proposal ID
+            var eProposal = await _context.Proposals.AddAsync(proposal);
             await _context.SaveChangesAsync();
-            return proposal.ProposalID;
+            return eProposal.Entity.ProposalID;
+
         }
 
 
@@ -86,6 +88,15 @@ namespace SecureMiles.Repositories.Proposals
             _context.Proposals.Update(proposal);
             await _context.SaveChangesAsync();
 
+            return true;
+        }
+
+
+        // method to update the proposal status
+        public async Task<bool> UpdateProposalAsync(Proposal proposal)
+        {
+            _context.Proposals.Update(proposal);
+            await _context.SaveChangesAsync();
             return true;
         }
 

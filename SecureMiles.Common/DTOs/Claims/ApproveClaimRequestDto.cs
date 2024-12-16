@@ -4,7 +4,7 @@ namespace SecureMiles.Common.DTOs.Claims
 
 {
 
-    public class ApproveClaimRequestDto
+    public class ApproveClaimRequestsDto
     {
         [StringLength(500, ErrorMessage = "Notes cannot exceed 500 characters.")]
         public string? Notes { get; set; }

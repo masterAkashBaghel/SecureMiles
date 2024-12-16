@@ -23,7 +23,7 @@ namespace SecureMiles.Models
         public DateTime UploadedDate { get; set; }
 
         // Navigation properties
-        public required Proposal Proposal { get; set; }
-        public required Claim Claim { get; set; }
+        public required Proposal? Proposal { get; set; }
+        public required Claim? Claim { get; set; }
     }
 }

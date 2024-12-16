@@ -31,9 +31,13 @@ namespace SecureMiles.Repositories.Policy
         }
         public async Task<Models.Policy?> GetPolicyByIdAsync(int policyId, int userId)
         {
+            // Return all the details associated with the policy
             return await _context.Policies
-                .Include(p => p.Vehicle) // Include related vehicle details
-                .FirstOrDefaultAsync(p => p.PolicyID == policyId && p.UserID == userId && p.Status != "Deleted");
+                .Include(p => p.Vehicle)
+                .Include(p => p.User)
+                .Include(p => p.Claims)
+                .Include(p => p.Payments)
+                .FirstOrDefaultAsync(p => p.PolicyID == policyId && p.UserID == userId);
         }
 
 

@@ -26,6 +26,7 @@ public class Policy
     [EnumDataType(typeof(PolicyStatus), ErrorMessage = "Invalid Status.")]
     public string Status { get; set; } = "Active";  // Default value
 
+
     [Range(0.01, double.MaxValue, ErrorMessage = "Premium Amount must be greater than 0.")]
     public decimal PremiumAmount { get; set; }
 

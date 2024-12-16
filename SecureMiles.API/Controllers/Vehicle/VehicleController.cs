@@ -188,5 +188,35 @@ namespace SecureMiles.API.Controllers.Vehicle
             }
         }
 
+        // get user vehicles by type 
+        [HttpGet("type/{vehicleType}")]
+        [Authorize] // Ensure the user is authenticated
+        public async Task<IActionResult> GetVehiclesByType(string vehicleType)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim == null)
+                {
+                    _logger.LogWarning("User ID claim is null.");
+                    return Unauthorized(new { Error = "Invalid user ID." });
+                }
+                var userId = int.Parse(userIdClaim); // Extract UserID from JWT
+                var vehicles = await _vehicleService.GetVehiclesByTypeAsync(userId, vehicleType);
+
+                if (vehicles == null || vehicles.Count() == 0)
+                {
+                    return NotFound(new { Message = "No vehicles found for this user." });
+                }
+
+                return Ok(vehicles); // Return the list of vehicles
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while retrieving vehicles for user.");
+                return StatusCode(500, new { Error = "An unexpected error occurred." });
+            }
+        }
+
     }
 }

@@ -34,3 +34,5 @@ BEGIN
 END;
 GO
 
+select *
+from Proposals

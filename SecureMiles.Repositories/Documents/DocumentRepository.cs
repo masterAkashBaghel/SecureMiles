@@ -97,6 +97,14 @@ namespace SecureMiles.Repositories.Documents
         }
 
 
+        // add a document and return the document
+        public async Task<Models.Document> AddClaimDocument(Models.Document document)
+        {
+            await _context.Documents.AddAsync(document);
+            await _context.SaveChangesAsync();
+            return document;
+        }
+
 
     }
 }

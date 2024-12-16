@@ -268,6 +268,12 @@ namespace SecureMiles.API.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("PolicyType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("PremiumAmount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal>("RequestedCoverage")
                         .HasColumnType("decimal(18, 2)");
 

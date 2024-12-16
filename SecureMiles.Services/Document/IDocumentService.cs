@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using SecureMiles.Common.DTOs.Documents;
 
 namespace SecureMiles.Services.Document
@@ -8,5 +9,11 @@ namespace SecureMiles.Services.Document
         Task<DocumentDetailsResponseDto> GetDocumentDetailsAsync(int documentId, int userId);
 
         Task DeleteDocumentAsync(int documentId, int userId);
+
+        Task<Models.Document> SaveDocumentForClaimAsync(int claimId, int userId, IFormFile filePath);
+
+        Task<Models.Document> SaveDocumentForProposalAsync(int userId, int proposalId, IFormFile filePath);
+
+
     }
 }

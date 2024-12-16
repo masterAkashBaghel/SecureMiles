@@ -61,13 +61,13 @@ namespace SecureMiles.Services.Vehicle
             _logger.LogInformation("Vehicle added successfully for User ID: {UserId}", userId);
 
             // Generate policy options
-            return GeneratePolicyOptions(vehicle);
+            return GeneratePolicyOptions(vehicle, request.MarketValue);
         }
 
-        public IEnumerable<PolicyOptionDto> GeneratePolicyOptions(Models.Vehicle vehicle)
+        public IEnumerable<PolicyOptionDto> GeneratePolicyOptions(Models.Vehicle vehicle, decimal marketValue)
         {
             // Example logic for generating policy options
-            decimal baseCoverage = vehicle.MarketValue * 0.75m;
+            decimal baseCoverage = marketValue * 0.75m;
             decimal basePremium = baseCoverage * 0.02m;
 
             return new List<PolicyOptionDto>
@@ -189,6 +189,35 @@ namespace SecureMiles.Services.Vehicle
             }
 
             return deleted;
+        }
+
+        // get vehicle by type
+        public async Task<List<VehicleResponseDto>> GetVehiclesByTypeAsync(int userId, string type)
+        {
+            var vehicles = await _vehicleRepository.GetVehiclesByTypeAsync(userId, type);
+            if (vehicles == null)
+            {
+                _logger.LogWarning("No vehicles found for user: {UserId}", userId);
+                throw new KeyNotFoundException("No vehicles found for this user.");
+            }
+
+            // Map the vehicle entities to DTOs
+            return vehicles.Select(v => new VehicleResponseDto
+            {
+                VehicleID = v.VehicleID,
+                Make = v.Make,
+                Model = v.Model,
+                Year = v.Year,
+                RegistrationNumber = v.RegistrationNumber,
+                Type = v.Type,
+                Color = v.Color,
+                FuelType = v.FuelType,
+                MarketValue = v.MarketValue,
+                ChassisNumber = v.ChassisNumber,
+                EngineNumber = v.EngineNumber,
+                PurchaseDate = v.PurchaseDate,
+
+            }).ToList();
         }
 
     }

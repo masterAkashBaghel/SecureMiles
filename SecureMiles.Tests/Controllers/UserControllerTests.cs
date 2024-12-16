@@ -1,8 +1,10 @@
 using NUnit.Framework;
 using Microsoft.Extensions.Logging;
 using Moq;
+ 
 using System.Security.Claims;
 using System.Threading.Tasks;
+ 
 using Microsoft.AspNetCore.Mvc;
 using SecureMiles.Services;
 using SecureMiles.API.Controllers;

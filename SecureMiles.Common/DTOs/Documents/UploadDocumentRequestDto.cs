@@ -12,7 +12,7 @@ namespace SecureMiles.Common.DTOs.Documents
         public IFormFile? DocumentFile { get; set; }
 
         public int? ClaimID { get; set; }  // Optional: can be null if the document is related to a proposal
-        public int? ProposalID { get; set; }  // Optional: can be null if the document is related to a claim
+        public int ProposalID { get; set; }  // Optional: can be null if the document is related to a claim
 
     }
 

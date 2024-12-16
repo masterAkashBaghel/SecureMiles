@@ -7,6 +7,7 @@ using SecureMiles.Common.DTOs.Vehicle;
 using SecureMiles.Repositories;
 using SecureMiles.Repositories.Proposals;
 using SecureMiles.Repositories.Vehicle;
+using SecureMiles.Services.Document;
 
 namespace SecureMiles.Services.Proposals
 {
@@ -20,13 +21,16 @@ namespace SecureMiles.Services.Proposals
 
         private readonly IUserRepository _userRepository;
 
-        public ProposalService(IProposalsRepository proposalRepository, IConfiguration configuration, ILogger<ProposalService> logger, IVehicleRepository vehicleRepository, IUserRepository userRepository)
+        private readonly IDocumentService _documentService;
+
+        public ProposalService(IProposalsRepository proposalRepository, IConfiguration configuration, ILogger<ProposalService> logger, IVehicleRepository vehicleRepository, IUserRepository userRepository, IDocumentService documentService)
         {
             _proposalRepository = proposalRepository;
             _configuration = configuration;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _vehicleRepository = vehicleRepository;
             _userRepository = userRepository;
+            _documentService = documentService;
         }
 
 
@@ -40,7 +44,7 @@ namespace SecureMiles.Services.Proposals
                 throw new KeyNotFoundException("Vehicle not found or unauthorized access.");
             }
 
-            // Create the Proposal object
+
             var proposal = new Models.Proposal
             {
                 VehicleID = request.VehicleId,
@@ -54,11 +58,29 @@ namespace SecureMiles.Services.Proposals
                 User = eUser,// Set the required User property
                 Documents = [], // Initialize the Documents list
                 Policy = null,
+                PolicyType = request.PolicyType,
+                PremiumAmount = (decimal)request.PremiumAmount
 
             };
 
+
+
+
             // Add the proposal to the database
             var proposalId = await _proposalRepository.AddProposalAsync(proposal);
+
+            if (request.ProposalDocument != null)
+            {
+                var response = await _documentService.SaveDocumentForProposalAsync(userId, proposalId, request.ProposalDocument);
+                if (response == null)
+                {
+                    throw new InvalidOperationException("Document upload failed.");
+                }
+                proposal.Documents.Add(response);
+
+                await _proposalRepository.UpdateProposalAsync(proposal);
+            }
+
 
             return new SubmitProposalResponseDto
             {
@@ -82,6 +104,9 @@ namespace SecureMiles.Services.Proposals
                 RequestedCoverage = p.RequestedCoverage,
                 Status = p.Status,
                 SubmissionDate = p.SubmissionDate,
+                PremiumAmount = p.PremiumAmount,
+                PolicyType = p.PolicyType
+
             }).ToList();
         }
         public async Task<ProposalDetailsResponseDto> GetProposalByIdAsync(int proposalId, int userId)

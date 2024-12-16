@@ -14,9 +14,13 @@ namespace SecureMiles.Models
         [Required(ErrorMessage = "Vehicle ID is required.")]
         public int VehicleID { get; set; }  // Foreign Key to Vehicle
 
+        public string? PolicyType { get; set; }
+
         [Required(ErrorMessage = "Requested Coverage is required.")]
         [Range(0.01, double.MaxValue, ErrorMessage = "Requested Coverage must be greater than 0.")]
         public decimal RequestedCoverage { get; set; }
+
+        public decimal PremiumAmount { get; set; }
 
         [Required(ErrorMessage = "Status is required.")]
         [EnumDataType(typeof(ProposalStatus), ErrorMessage = "Invalid Status.")]

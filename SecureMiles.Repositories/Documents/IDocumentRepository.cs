@@ -10,6 +10,8 @@ namespace SecureMiles.Repositories.Documents
         Task<UploadDocumentResponseDto> AddAsync(Models.Document document);
         Task<Models.Document?> GetDocumentByIdAsync(int documentId, int userId);
         Task DeleteAsync(Models.Document document);
+
+        Task<Models.Document> AddClaimDocument(Models.Document document);
     }
 
 
