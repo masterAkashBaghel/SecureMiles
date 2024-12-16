@@ -1,3 +1,4 @@
+
 public class RegisterResponseDto
 {
     public bool Success { get; set; }
@@ -5,5 +6,5 @@ public class RegisterResponseDto
 
     public int StatusCode { get; set; }
 
-
+    
 }

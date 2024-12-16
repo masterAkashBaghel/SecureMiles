@@ -19,6 +19,10 @@ namespace SecureMiles.API.Controllers.Payment
         [HttpPost("create-payment")]
         public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentRequestDto request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var successUrl = $"{Request.Scheme}://{Request.Host}/api/paypal/execute-payment";
             var cancelUrl = $"{Request.Scheme}://{Request.Host}/api/paypal/cancel";
 
@@ -29,8 +33,20 @@ namespace SecureMiles.API.Controllers.Payment
         [HttpGet("execute-payment")]
         public async Task<IActionResult> ExecutePayment([FromQuery] string paymentId, [FromQuery] string payerId)
         {
-            var response = await _payPalService.ExecutePaymentAsync(paymentId, payerId);
-            return Ok(response);
+            try
+            {
+                var response = await _payPalService.ExecutePaymentAsync(paymentId, payerId);
+                return Ok(response);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { Error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Error = "An unexpected error occurred." });
+            }
         }
+
     }
 }

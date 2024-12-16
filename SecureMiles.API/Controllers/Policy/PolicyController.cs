@@ -32,11 +32,17 @@ namespace SecureMiles.API.Controllers.Policy
 
             try
             {
+                // Add logging to check if the controller is entering this part
+                _logger.LogInformation("Checking user identifier claim.");
+
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
                 if (userIdClaim == null)
                 {
+                    // Log if the claim is missing
+                    _logger.LogWarning("User identifier claim is missing.");
                     return Unauthorized(new { Error = "User identifier claim is missing." });
                 }
+
                 var userId = int.Parse(userIdClaim);
                 var result = await _policyService.CreatePolicyAsync(userId, request);
 
