@@ -255,19 +255,57 @@ namespace SecureMiles.Repositories.Admin
 
         public async Task<DashboardDataResponseDto> GetDashboardDataAsync()
         {
+            // Overall counts
             var totalUsers = await _context.Users.CountAsync();
             var totalPolicies = await _context.Policies.CountAsync();
             var totalClaims = await _context.Claims.CountAsync();
             var totalProposals = await _context.Proposals.CountAsync();
+            var totalVehicles = await _context.Vehicles.CountAsync();
 
+            // Active counts
+            var activePolicies = await _context.Policies.CountAsync(p => p.Status == "Active");
+            var activeClaims = await _context.Claims.CountAsync(c => c.Status == "Pending" || c.Status == "UnderReview");
+            var activeProposals = await _context.Proposals.CountAsync(p => p.Status == "Proposal Submitted" || p.Status == "UnderReview");
+            var activeVehicles = await _context.Vehicles.CountAsync(v => v.IsActive);
+
+            // Trends over the last month
+            var oneMonthAgo = DateTime.UtcNow.AddMonths(-1);
+            var claimsLastMonth = await _context.Claims.CountAsync(c => c.CreatedAt >= oneMonthAgo);
+            var proposalsLastMonth = await _context.Proposals.CountAsync(p => p.CreatedAt >= oneMonthAgo);
+            var policiesLastMonth = await _context.Policies.CountAsync(p => p.CreatedAt >= oneMonthAgo);
+            var vehiclesLastMonth = await _context.Vehicles.CountAsync(v => v.CreatedAt >= oneMonthAgo);
+
+            // Trends over the last year
+            var oneYearAgo = DateTime.UtcNow.AddYears(-1);
+            var claimsLastYear = await _context.Claims.CountAsync(c => c.CreatedAt >= oneYearAgo);
+            var proposalsLastYear = await _context.Proposals.CountAsync(p => p.CreatedAt >= oneYearAgo);
+            var policiesLastYear = await _context.Policies.CountAsync(p => p.CreatedAt >= oneYearAgo);
+
+            // Return dashboard data
             return new DashboardDataResponseDto
             {
                 TotalUsers = totalUsers,
                 TotalPolicies = totalPolicies,
                 TotalClaims = totalClaims,
-                TotalProposals = totalProposals
+                TotalProposals = totalProposals,
+                TotalVehicles = totalVehicles,
+
+                ActivePolicies = activePolicies,
+                ActiveClaims = activeClaims,
+                ActiveProposals = activeProposals,
+                ActiveVehicles = activeVehicles,
+
+                ClaimsLastMonth = claimsLastMonth,
+                ProposalsLastMonth = proposalsLastMonth,
+                PoliciesLastMonth = policiesLastMonth,
+                VehiclesLastMonth = vehiclesLastMonth,
+
+                ClaimsLastYear = claimsLastYear,
+                ProposalsLastYear = proposalsLastYear,
+                PoliciesLastYear = policiesLastYear
             };
         }
+
 
         // method to get all proposals for review without using stored procedure
 
