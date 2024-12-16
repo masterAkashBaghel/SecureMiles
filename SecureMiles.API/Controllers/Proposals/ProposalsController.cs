@@ -22,7 +22,7 @@ namespace SecureMiles.API.Controllers.Proposals
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> SubmitProposal([FromBody] SubmitProposalRequestDto request)
+        public async Task<IActionResult> SubmitProposal([FromForm] SubmitProposalRequestDto request)
         {
             if (!ModelState.IsValid)
             {

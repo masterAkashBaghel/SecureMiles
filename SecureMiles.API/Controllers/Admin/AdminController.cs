@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SecureMiles.Common.DTOs.Admin;
 using SecureMiles.Services.Admin;
+using SecureMiles.Services.Claims;
 
 namespace SecureMiles.API.Controllers.Admin
 {
@@ -13,10 +14,15 @@ namespace SecureMiles.API.Controllers.Admin
         private readonly IAdminService _adminService;
         private readonly ILogger<AdminController> _logger;
 
-        public AdminController(IAdminService adminService, ILogger<AdminController> logger)
+        private readonly IClaimService _claimService;
+
+
+        public AdminController(IAdminService adminService, ILogger<AdminController> logger, IClaimService claimService)
         {
             _adminService = adminService;
             _logger = logger;
+            _claimService = claimService;
+
         }
 
         [HttpGet]
@@ -227,5 +233,100 @@ namespace SecureMiles.API.Controllers.Admin
                 return StatusCode(500, new { Error = "An unexpected error occurred." });
             }
         }
+
+        // method to reject proposal by admin
+
+        [HttpPut("proposals/{proposalId}/reject")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RejectProposal(int proposalId, [FromBody] RejectProposalRequestDto request)
+        {
+            try
+            {
+                var response = await _adminService.RejectProposalAsync(proposalId, request);
+                return Ok(response);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized access or proposal not found: {ProposalId}", proposalId);
+                return NotFound(new { Error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while rejecting proposal {ProposalId}.", proposalId);
+                return StatusCode(500, new { Error = "An unexpected error occurred." });
+            }
+        }
+
+        //method to approve claim by admin by taking claim amount as input ,id 
+        [HttpPut("claims/{claimId}/approve")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ApproveClaim(int claimId, [FromBody] ApproveClaimRequestDto request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var response = await _adminService.ApproveClaimAsync(claimId, request);
+                return Ok(response);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized access or claim not found: {ClaimId}", claimId);
+                return NotFound(new { Error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while approving claim {ClaimId}.", claimId);
+                return StatusCode(500, new { Error = "An unexpected error occurred." });
+            }
+        }
+
+        // method to reject claim by admin by taking claim id as input
+        [HttpPut("claims/{claimId}/reject")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RejectClaim(int claimId, [FromBody] string notes)
+        {
+            try
+            {
+                var response = await _adminService.RejectClaimAsync(claimId, notes);
+                return Ok(response);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized access or claim not found: {ClaimId}", claimId);
+                return NotFound(new { Error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while rejecting claim {ClaimId}.", claimId);
+                return StatusCode(500, new { Error = "An unexpected error occurred." });
+            }
+        }
+
+        // get all the details of a claim by claim id
+        [HttpGet("claims/{claimId}/details/{userId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetClaimDetails(int claimId, int userId)
+        {
+            try
+            {
+                var response = await _claimService.GetClaimByIdAsync(claimId, userId);
+                return Ok(response);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized access or claim not found: {ClaimId}", claimId);
+                return NotFound(new { Error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching claim details for ClaimID {ClaimId}.", claimId);
+                return StatusCode(500, new { Error = "An unexpected error occurred." });
+            }
+        }
+
     }
 }

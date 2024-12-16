@@ -35,4 +35,4 @@ END;
 GO
 
 select *
-from vehicles
+from Proposals

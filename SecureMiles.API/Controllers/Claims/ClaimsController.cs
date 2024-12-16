@@ -152,38 +152,38 @@ namespace SecureMiles.API.Controllers.Claims
                 return StatusCode(500, new { Error = "An unexpected error occurred." });
             }
         }
-        [HttpPost("{claimId}/approve")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ApproveClaim(int claimId, [FromBody] ApproveClaimRequestDto request)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        // [HttpPost("{claimId}/approve")]
+        // [Authorize(Roles = "Admin")]
+        // public async Task<IActionResult> ApproveClaim(int claimId, [FromBody] ApproveClaimRequestsDto request)
+        // {
+        //     if (!ModelState.IsValid)
+        //     {
+        //         return BadRequest(ModelState);
+        //     }
 
-            try
-            {
+        //     try
+        //     {
 
-                var result = await _claimService.ApproveClaimAsync(claimId, request, true);
+        //         var result = await _claimService.ApproveClaimAsync(claimId, request, true);
 
-                return Ok(result);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                _logger.LogWarning(ex, "Claim not found or not eligible for approval: {ClaimId}", claimId);
-                return NotFound(new { Error = ex.Message });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                _logger.LogWarning(ex, "Unauthorized access attempt for claim approval: {ClaimId}", claimId);
-                return Forbid();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while approving claim {ClaimId}.", claimId);
-                return StatusCode(500, new { Error = "An unexpected error occurred." });
-            }
-        }
+        //         return Ok(result);
+        //     }
+        //     catch (KeyNotFoundException ex)
+        //     {
+        //         _logger.LogWarning(ex, "Claim not found or not eligible for approval: {ClaimId}", claimId);
+        //         return NotFound(new { Error = ex.Message });
+        //     }
+        //     catch (UnauthorizedAccessException ex)
+        //     {
+        //         _logger.LogWarning(ex, "Unauthorized access attempt for claim approval: {ClaimId}", claimId);
+        //         return Forbid();
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         _logger.LogError(ex, "Error occurred while approving claim {ClaimId}.", claimId);
+        //         return StatusCode(500, new { Error = "An unexpected error occurred." });
+        //     }
+        // }
         [HttpPost("{claimId}/reject")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RejectClaim(int claimId, [FromBody] RejectClaimRequestDto request)
@@ -228,6 +228,42 @@ namespace SecureMiles.API.Controllers.Claims
                 return StatusCode(500, new { Error = "An unexpected error occurred." });
             }
         }
+
+        // method to delete a claim
+        [HttpDelete("{claimId}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteClaim(int claimId)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim == null)
+                {
+                    throw new UnauthorizedAccessException("User ID claim not found.");
+                }
+                var userId = int.Parse(userIdClaim);
+
+                var result = await _claimService.DeleteClaimAsync(claimId, userId);
+
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized attempt to delete claim {ClaimId}.", claimId);
+                return Forbid();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "Claim not found: {ClaimId}", claimId);
+                return NotFound(new { Error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while deleting claim {ClaimId}.", claimId);
+                return StatusCode(500, new { Error = "An unexpected error occurred." });
+            }
+        }
+
 
     }
 }
