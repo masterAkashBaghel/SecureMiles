@@ -4,6 +4,9 @@ namespace SecureMiles.Common.DTOs.User
 {
     public class UpdateUserProfileResponseDto
     {
+        public string Message;
+        public int StatusCode;
+
         public int UserId { get; set; }
         public required string Name { get; set; }
         public required string Address { get; set; }
