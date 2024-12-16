@@ -382,5 +382,40 @@ namespace SecureMiles.Repositories.Admin
 
 
         }
+
+        // method to reject proposal by admin
+
+        public async Task RejectProposalAsync(int proposalId, string reason)
+        {
+            var proposal = await _context.Proposals.FindAsync(proposalId);
+            if (proposal == null)
+            {
+                throw new KeyNotFoundException("Proposal not found.");
+            }
+
+            proposal.Status = "Rejected";
+            _context.Proposals.Update(proposal);
+            await _context.SaveChangesAsync();
+        }
+
+        //method to approve claim by admin by taking claim amount as input ,id 
+
+        public async Task ApproveClaimAsync(int claimId, decimal claimAmount)
+        {
+            var claim = await _context.Claims.FindAsync(claimId);
+            if (claim == null)
+            {
+                throw new KeyNotFoundException("Claim not found.");
+            }
+
+            claim.Status = "Approved";
+            claim.ClaimAmount = claimAmount;
+            claim.ApprovalDate = DateTime.UtcNow;
+            _context.Claims.Update(claim);
+            await _context.SaveChangesAsync();
+        }
+
+
+
     }
 }

@@ -12,7 +12,7 @@ namespace SecureMiles.Services.Document
 
         Task<Models.Document> SaveDocumentForClaimAsync(int claimId, int userId, IFormFile filePath);
 
-        Task<Models.Document> SaveDocumentForProposalAsync(int proposalId, int userId, IFormFile filePath);
+        Task<Models.Document> SaveDocumentForProposalAsync(int userId, int proposalId, IFormFile filePath);
 
 
     }

@@ -183,7 +183,7 @@ namespace SecureMiles.Services.Claims
 
             return await _claimRepository.UpdateClaimAsync(claimId, userId, isAdmin, request);
         }
-        public async Task<ApproveClaimResponseDto> ApproveClaimAsync(int claimId, ApproveClaimRequestDto request, bool isAdmin)
+        public async Task<ApproveClaimResponseDto> ApproveClaimAsync(int claimId, ApproveClaimRequestsDto request, bool isAdmin)
         {
             if (!isAdmin)
             {
@@ -212,6 +212,25 @@ namespace SecureMiles.Services.Claims
                 PolicyId = claim.PolicyID,
                 Status = claim.Status,
                 Notes = claim.Description,
+            };
+        }
+
+        // method to delete a claim
+        public async Task<DeleteClaimResponseDto> DeleteClaimAsync(int claimId, int userId)
+        {
+            var claim = await _claimRepository.GetClaimByIdAsync(claimId, userId);
+
+            if (claim == null)
+            {
+                throw new KeyNotFoundException("Claim not found or unauthorized access.");
+            }
+
+            var response = await _claimRepository.DeleteClaimAsync(claimId);
+            return new DeleteClaimResponseDto
+            {
+                ClaimID = response.ClaimID,
+                Status = response.Status,
+                Message = "Claim deleted successfully."
             };
         }
 

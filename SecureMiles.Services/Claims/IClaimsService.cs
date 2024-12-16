@@ -9,7 +9,8 @@ namespace SecureMiles.Services.Claims
         Task<List<ClaimResponseDto>> GetClaimsAsync(int userId);
         Task<ClaimDetailsResponseDto> GetClaimByIdAsync(int claimId, int userId);
         Task<UpdateClaimResponseDto> UpdateClaimAsync(int claimId, int userId, bool isAdmin, UpdateClaimRequestDto request);
-        Task<ApproveClaimResponseDto> ApproveClaimAsync(int claimId, ApproveClaimRequestDto request, bool isAdmin);
+        Task<ApproveClaimResponseDto> ApproveClaimAsync(int claimId, ApproveClaimRequestsDto request, bool isAdmin);
         Task<RejectClaimResponseDto> RejectClaimAsync(int claimId, RejectClaimRequestDto request, bool isAdmin);
+        Task<DeleteClaimResponseDto> DeleteClaimAsync(int claimId, int userId);
     }
 }

@@ -41,18 +41,13 @@ namespace SecureMiles.Services.Document
             {
                 throw new InvalidOperationException("Document upload failed.");
             }
-            // get related claim or proposal
 
-            Models.Proposal? proposal = null;
-
-            if (request.ProposalID.HasValue)
+            var proposal = await _ProposalRepository.GetProposalByIdAsync(request.ProposalID, userId);
+            if (proposal == null)
             {
-                proposal = await _ProposalRepository.GetProposalByIdAsync(request.ProposalID.Value, userId);
-                if (proposal == null)
-                {
-                    throw new KeyNotFoundException("Proposal not found.");
-                }
+                throw new KeyNotFoundException("Proposal not found.");
             }
+
             // Save document information to the database 
             var document = new Models.Document
             {
@@ -105,7 +100,7 @@ namespace SecureMiles.Services.Document
         }
 
         // save a documnet for proposal (params proposalId, userId, filepath)
-        public async Task<Models.Document> SaveDocumentForProposalAsync(int proposalId, int userId, IFormFile filePath)
+        public async Task<Models.Document> SaveDocumentForProposalAsync(int userId, int proposalId, IFormFile filePath)
         {
             // get related proposal
             var proposal = await _ProposalRepository.GetProposalByIdAsync(proposalId, userId);

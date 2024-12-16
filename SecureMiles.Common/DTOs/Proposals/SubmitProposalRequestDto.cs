@@ -1,5 +1,6 @@
 
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace SecureMiles.Common.DTOs.Proposals
 {
@@ -17,6 +18,7 @@ namespace SecureMiles.Common.DTOs.Proposals
 
         public decimal? PremiumAmount { get; set; }
 
+        public IFormFile? ProposalDocument { get; set; }
 
     }
 

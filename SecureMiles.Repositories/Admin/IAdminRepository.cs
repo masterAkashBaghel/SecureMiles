@@ -26,5 +26,9 @@ namespace SecureMiles.Repositories.Admin
         Task DeleteProposalAsync(int proposalId);
 
         Task ApproveProposalAsync(int proposalId);
+
+        Task RejectProposalAsync(int proposalId, string reason);
+
+        Task ApproveClaimAsync(int claimId, decimal claimAmount);
     }
 }

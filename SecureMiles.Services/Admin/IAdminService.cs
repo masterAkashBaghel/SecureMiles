@@ -26,6 +26,10 @@ namespace SecureMiles.Services.Admin
 
         Task<ApproveProposalResponseDto> ApproveProposalAsync(int proposalId);
 
+        Task<ApproveClaimResponseDto> ApproveClaimAsync(int claimId, ApproveClaimRequestDto request);
+        Task<String> RejectClaimAsync(int claimId, string reason);
+        Task<RejectProposalResponseDto> RejectProposalAsync(int proposalId, RejectProposalRequestDto request);
+
 
 
     }

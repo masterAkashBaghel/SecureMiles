@@ -71,7 +71,7 @@ namespace SecureMiles.Repositories.Claims
 
             throw new KeyNotFoundException("Claim update failed.");
         }
-        public async Task<ApproveClaimResponseDto> ApproveClaimAsync(int claimId, ApproveClaimRequestDto request)
+        public async Task<ApproveClaimResponseDto> ApproveClaimAsync(int claimId, ApproveClaimRequestsDto request)
         {
             using var command = _context.Database.GetDbConnection().CreateCommand();
             command.CommandText = "ApproveClaim";
@@ -132,6 +132,45 @@ namespace SecureMiles.Repositories.Claims
             _context.Claims.Update(claim);
             await _context.SaveChangesAsync();
             return claim;
+        }
+
+        //method to delete a claim in Pending or UnderReview status
+        public async Task<Claim> DeleteClaimAsync(int claimId)
+        {
+            var claim = await _context.Claims
+                .Include(c => c.Policy) // Include associated policy for validation
+                .FirstOrDefaultAsync(c => c.ClaimID == claimId);
+
+            if (claim == null)
+            {
+                throw new KeyNotFoundException("Claim not found.");
+            }
+
+            if (claim.Status != "Pending" && claim.Status != "UnderReview")
+            {
+                throw new InvalidOperationException("Only claims that are pending or under review can be deleted.");
+            }
+
+            _context.Claims.Remove(claim);
+            await _context.SaveChangesAsync();
+
+            return claim;
+        }
+
+        // get a cliam by claim id and return  userID
+
+        public async Task<int?> GetClaimByIdAsync(int claimId)
+        {
+            var claim = await _context.Claims
+                .Include(c => c.Policy) // Include associated policy for validation
+                 .FirstOrDefaultAsync(c => c.ClaimID == claimId);
+
+            if (claim == null)
+            {
+                throw new KeyNotFoundException("Claim not found.");
+            }
+
+            return claim.Policy.UserID;
         }
     }
 }
