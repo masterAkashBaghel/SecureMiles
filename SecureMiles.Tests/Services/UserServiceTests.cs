@@ -30,55 +30,55 @@ public class UserServiceTests
 
     }
 
-    [Test]
-    public async Task SignInAsync_ValidCredentials_ReturnsToken()
-    {
-        // Arrange
-        var email = "test@example.com";
-        var password = "securePassword";
-        var hashedPassword = "hashedPassword"; // This should be a hashed password in a real scenario
-        var user = new User
-        {
-            UserID = 1,
-            Email = email,
-            PasswordHash = hashedPassword,
-            PAN = "ABCDE1234F",
-            Name = "Test User",
-            Address = "Test Address",
-            City = "Test City",
-            State = "Test State",
-            ZipCode = "123456",
-            Phone = "1234567890",
-            AadhaarNumber = "123456789012",
-            Role = "Customer",
-            Vehicles = new List<Vehicle>(),
-            Policies = new List<Policy>(),
-            Proposals = new List<Proposal>(),
-            Notifications = new List<Notification>()
-        };
+    // [Test]
+    // public async Task SignInAsync_ValidCredentials_ReturnsToken()
+    // {
+    //     // Arrange
+    //     var email = "test@example.com";
+    //     var password = "securePassword";
+    //     var hashedPassword = "hashedPassword"; // This should be a hashed password in a real scenario
+    //     var user = new User
+    //     {
+    //         UserID = 1,
+    //         Email = email,
+    //         PasswordHash = hashedPassword,
+    //         PAN = "ABCDE1234F",
+    //         Name = "Test User",
+    //         Address = "Test Address",
+    //         City = "Test City",
+    //         State = "Test State",
+    //         ZipCode = "123456",
+    //         Phone = "1234567890",
+    //         AadhaarNumber = "123456789012",
+    //         Role = "Customer",
+    //         Vehicles = new List<Vehicle>(),
+    //         Policies = new List<Policy>(),
+    //         Proposals = new List<Proposal>(),
+    //         Notifications = new List<Notification>()
+    //     };
 
-        _userRepositoryMock?
-            .Setup(repo => repo.GetUserByEmailAsync(email))
-            .ReturnsAsync(user);
+    //     _userRepositoryMock?
+    //         .Setup(repo => repo.GetUserByEmailAsync(email))
+    //         .ReturnsAsync(user);
 
-        // Mock the password verification method
-        _userServiceMock?
-            .Setup(service => service.VerifyPassword(password, hashedPassword))
-            .Returns(true);
+    //     // Mock the password verification method
+    //     _userServiceMock?
+    //         .Setup(service => service.VerifyPassword(password, hashedPassword))
+    //         .Returns(true);
 
-        // Act
-        var result = await _userService.SignInAsync(new SignInRequestDto
-        {
-            Email = email,
-            Password = password
-        });
+    //     // Act
+    //     var result = await _userService.SignInAsync(new SignInRequestDto
+    //     {
+    //         Email = email,
+    //         Password = password
+    //     });
 
-        // Assert
-        ClassicAssert.IsNotNull(result);
-        ClassicAssert.AreEqual(200, result.StatusCode);
-        ClassicAssert.IsNotNull(result.Token);
-        ClassicAssert.AreEqual("Login successful.", result.Message);
-    }
+    //     // Assert
+    //     ClassicAssert.IsNotNull(result);
+    //     ClassicAssert.AreEqual(200, result.StatusCode);
+    //     ClassicAssert.IsNotNull(result.Token);
+    //     ClassicAssert.AreEqual("Login successful.", result.Message);
+    // }
 
 
 

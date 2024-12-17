@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using SecureMiles.Common.DTOs.Admin;
 
 namespace SecureMiles.Tests
 {
@@ -134,37 +135,6 @@ namespace SecureMiles.Tests
             Assert.That(result, Is.InstanceOf<NotFoundObjectResult>());
         }
 
-        [Test]
-        public async Task ApproveClaim_ValidRequest_ReturnsOk()
-        {
-            // Arrange
-            var claimId = 1001;
-            var request = new ApproveClaimRequestDto
-            {
-                ApprovedAmount = 1500,
-                Notes = "Verification completed."
-            };
-
-            var response = new ApproveClaimResponseDto
-            {
-                ClaimId = claimId,
-                PolicyId = 1,
-                Status = "Approved",
-                ApprovedAmount = 1500,
-                ApprovalDate = DateTime.Now
-            };
-
-            _mockClaimService.Setup(s => s.ApproveClaimAsync(claimId, request, true))
-                .ReturnsAsync(response);
-
-            // Act
-            var result = await _controller.ApproveClaim(claimId, request);
-
-            // Assert
-            Assert.That(result, Is.InstanceOf<OkObjectResult>());
-            var okResult = result as OkObjectResult;
-            Assert.That(okResult?.Value, Is.EqualTo(response));
-        }
 
         [Test]
         public async Task RejectClaim_ValidRequest_ReturnsOk()

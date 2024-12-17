@@ -6,6 +6,7 @@ using SecureMiles.Services.Admin;
 using SecureMiles.Common.DTOs.Admin;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using SecureMiles.Services.Claims;
 
 namespace SecureMiles.Tests
 {
@@ -13,13 +14,15 @@ namespace SecureMiles.Tests
     public class AdminControllerTests
     {
         private Mock<IAdminService> _adminServiceMock;
+        private Mock<IClaimService> _claimServiceMock;
         private AdminController _controller;
 
         [SetUp]
         public void Setup()
         {
             _adminServiceMock = new Mock<IAdminService>();
-            _controller = new AdminController(_adminServiceMock.Object, null); // Assuming logger is not needed for these tests
+            _claimServiceMock = new Mock<IClaimService>();
+            _controller = new AdminController(_adminServiceMock.Object, null, _claimServiceMock.Object); // Assuming logger is not needed for these tests
         }
 
         [Test]
@@ -67,7 +70,6 @@ namespace SecureMiles.Tests
             Assert.That(actualError, Is.EqualTo(expectedError));
         }
 
-
         [Test]
         public async Task UpdateUserRole_ShouldReturnBadRequest_WhenModelStateIsInvalid()
         {
@@ -104,8 +106,6 @@ namespace SecureMiles.Tests
             var errorMessages = errors["Role"] as string[];
             Assert.That(errorMessages, Does.Contain("Role is required."));
         }
-
-
 
         [Test]
         public async Task GetAllClaimsForReview_ShouldReturnOkResult_WhenSuccessful()
